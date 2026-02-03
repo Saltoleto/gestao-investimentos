@@ -119,21 +119,6 @@ document.addEventListener('DOMContentLoaded', () => {
     syncStatus.textContent = mensagem;
   };
 
-  const obterUsuarioSessao = async () => {
-    const { data: userData } = await supabase.auth.getUser();
-    if (userData?.user) {
-      return userData.user;
-    }
-    const { data: sessionData } = await supabase.auth.getSession();
-    if (sessionData?.session?.user) {
-      return sessionData.session.user;
-    }
-    if (usuarioAtualId) {
-      return { id: usuarioAtualId };
-    }
-    return null;
-  };
-
   const atualizarStatusComPendencias = async () => {
     if (!usuarioAtualId) {
       atualizarStatusSincronizacao(navigator.onLine ? 'online' : 'offline', navigator.onLine ? 'Online' : 'Offline');
@@ -672,8 +657,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // SALVAR / ATUALIZAR
   form.addEventListener('submit', async e => {
     e.preventDefault(); formError.innerText = ''; formSuccess.innerText = '';
-    const usuario = await obterUsuarioSessao();
-    if (!usuario?.id) { formError.innerText = 'Sessão inválida'; return; }
+    const { data: userData } = await supabase.auth.getUser();
+    if (!userData.user) { formError.innerText = 'Sessão inválida'; return; }
     const valor = parseFloat(valorInput.value.replace(/\./g, '').replace(',', '.'));
     if (!valor || valor <= 0) { formError.innerText = 'Valor inválido'; return; }
     const liquidez = document.querySelector('input[name="liquidez"]:checked').value;
@@ -682,8 +667,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const payloadBase = { banco: bancoSearch.value, tipo_produto: tipoInput.value, descricao_produto: descricaoInput.value, valor, liquidez, data_aporte: dataInput.value, 
       data_vencimento: liquidez === 'No vencimento' ? vencimentoInput.value : null
     };
-    const usuarioId = usuario.id;
-    usuarioAtualId = usuarioId;
+    const usuarioId = userData.user.id;
 
     if (!navigator.onLine) {
       if (investimentoEditandoId) {
