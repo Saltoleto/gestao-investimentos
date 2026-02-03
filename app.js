@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const filtroTipo = document.getElementById('filtro-tipo');
   const filtroLiquidez = document.getElementById('filtro-liquidez');
   const btnLimparFiltros = document.getElementById('btn-limpar-filtros');
+  const totaisSection = document.getElementById('totais-section');
 
   const emailInput = document.getElementById('email');
   const passwordInput = document.getElementById('password');
@@ -100,6 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return bancoOk && tipoOk && liquidezOk;
     });
 
+    renderizarTotais(filtrados);
     renderizarInvestimentos(filtrados);
   }
 
@@ -221,6 +223,100 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       lista.appendChild(div);
     });
+  }
+
+  function agruparInvestimentos(investimentos, chave, labelFallback = 'Não informado') {
+    return investimentos.reduce((acc, item) => {
+      const label = item[chave] || labelFallback;
+      if (!acc[label]) acc[label] = { total: 0, quantidade: 0 };
+      acc[label].total += item.valor || 0;
+      acc[label].quantidade += 1;
+      return acc;
+    }, {});
+  }
+
+  function ordenarGrupos(grupos) {
+    return Object.entries(grupos)
+      .map(([label, dados]) => ({ label, ...dados }))
+      .sort((a, b) => b.total - a.total || a.label.localeCompare(b.label));
+  }
+
+  function criarTabelaTotais(titulo, grupos, emptyMessage) {
+    const card = document.createElement('div');
+    card.className = 'totais-card';
+    card.innerHTML = `<h3>${titulo}</h3>`;
+
+    if (!grupos.length) {
+      const empty = document.createElement('p');
+      empty.className = 'info';
+      empty.textContent = emptyMessage;
+      card.appendChild(empty);
+      return card;
+    }
+
+    const table = document.createElement('table');
+    table.className = 'totais-table';
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th>Grupo</th>
+          <th>Qtd.</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${grupos
+          .map(
+            grupo => `
+          <tr>
+            <td>${grupo.label}</td>
+            <td>${grupo.quantidade}</td>
+            <td>${formatarMoeda(grupo.total)}</td>
+          </tr>
+        `
+          )
+          .join('')}
+      </tbody>
+    `;
+    card.appendChild(table);
+    return card;
+  }
+
+  function renderizarTotais(investimentos) {
+    totaisSection.innerHTML = '';
+
+    const totalValor = investimentos.reduce((acc, item) => acc + (item.valor || 0), 0);
+    const totalQuantidade = investimentos.length;
+    const ticketMedio = totalQuantidade ? totalValor / totalQuantidade : 0;
+
+    const resumoCard = document.createElement('div');
+    resumoCard.className = 'totais-card';
+    resumoCard.innerHTML = `
+      <h3>Resumo geral</h3>
+      <div class="totais-resumo">
+        <div class="totais-kpi">
+          <span>Total investido</span>
+          <strong>${formatarMoeda(totalValor)}</strong>
+        </div>
+        <div class="totais-kpi">
+          <span>Quantidade de investimentos</span>
+          <strong>${totalQuantidade}</strong>
+        </div>
+        <div class="totais-kpi">
+          <span>Ticket médio</span>
+          <strong>${formatarMoeda(ticketMedio)}</strong>
+        </div>
+      </div>
+    `;
+    totaisSection.appendChild(resumoCard);
+
+    const gruposBanco = ordenarGrupos(agruparInvestimentos(investimentos, 'banco'));
+    const gruposTipo = ordenarGrupos(agruparInvestimentos(investimentos, 'tipo_produto'));
+    const gruposLiquidez = ordenarGrupos(agruparInvestimentos(investimentos, 'liquidez'));
+
+    totaisSection.appendChild(criarTabelaTotais('Por banco/corretora', gruposBanco, 'Sem dados para bancos/corretoras.'));
+    totaisSection.appendChild(criarTabelaTotais('Por tipo de produto', gruposTipo, 'Sem dados para tipos de produto.'));
+    totaisSection.appendChild(criarTabelaTotais('Por liquidez', gruposLiquidez, 'Sem dados para liquidez.'));
   }
 
   // LISTAR INVESTIMENTOS
