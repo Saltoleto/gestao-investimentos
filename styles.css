@@ -39,6 +39,10 @@ body {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  max-width: 520px;
+  margin: 0 auto;
+  text-align: center;
+  align-items: center;
 }
 
 .page-header h1 {
@@ -75,8 +79,9 @@ body {
 }
 
 .auth-card {
-  max-width: 380px;
-  margin: 24px auto;
+  width: 100%;
+  max-width: 420px;
+  margin: 16px auto 24px;
 }
 
 .filter-card {
