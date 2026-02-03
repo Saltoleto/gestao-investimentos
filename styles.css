@@ -9,18 +9,16 @@ body {
   background: #f4f6fb;
 }
 
-/* CONTAINER */
 .container {
   max-width: 900px;
   margin: auto;
 }
 
-/* CARDS */
 .card {
   background: white;
   padding: 20px;
   border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
 }
 
 .card-spacing {
@@ -32,7 +30,6 @@ body {
   margin: 40px auto;
 }
 
-/* FORM */
 .form-group {
   margin-bottom: 12px;
 }
@@ -49,36 +46,51 @@ input {
   border: 1px solid #ccc;
 }
 
-/* BOTÕES PRINCIPAIS */
-.btn-primary, .btn-cancel {
+.autocomplete {
+  position: relative;
+}
+
+.autocomplete-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 150px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: white;
+  z-index: 10;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.autocomplete-list li {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.autocomplete-list li:hover {
+  background-color: #667eea;
+  color: white;
+}
+
+.btn-primary {
   width: 100%;
+  background: #667eea;
+  color: white;
+  border: none;
   padding: 12px;
   border-radius: 8px;
   cursor: pointer;
   font-size: 16px;
-  border: none;
-}
-
-.btn-primary {
-  background: #667eea;
-  color: white;
 }
 
 .btn-primary:hover {
   background: #5a67d8;
 }
 
-.btn-cancel {
-  background: #718096;
-  color: white;
-  margin-top: 8px;
-}
-
-.btn-cancel:hover {
-  background: #4a5568;
-}
-
-/* BOTÃO LOGOUT */
 .btn-logout {
   background: #e53e3e;
   color: white;
@@ -88,7 +100,29 @@ input {
   cursor: pointer;
 }
 
-/* HEADER APP */
+.btn-cancel {
+  background: #718096;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.btn-cancel:hover {
+  background: #4a5568;
+}
+
+.form-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.form-buttons button {
+  flex: 1;
+}
+
 .app-header {
   display: flex;
   justify-content: space-between;
@@ -96,14 +130,12 @@ input {
   margin-bottom: 16px;
 }
 
-/* LISTA DE INVESTIMENTOS */
 .investimento-card {
   padding: 12px;
   border-bottom: 1px solid #eee;
   position: relative;
 }
 
-/* AÇÕES DO INVESTIMENTO */
 .investimento-acoes {
   margin-top: 8px;
   display: flex;
@@ -139,9 +171,13 @@ input {
   background: #c53030;
 }
 
-/* FEEDBACK */
 .error {
   color: #e53e3e;
+  margin-top: 8px;
+}
+
+.success {
+  color: #38a169;
   margin-top: 8px;
 }
 
@@ -149,7 +185,6 @@ input {
   display: none;
 }
 
-/* RESPONSIVO */
 @media (min-width: 768px) {
   .container {
     display: grid;
