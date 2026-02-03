@@ -44,8 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
   let investimentoEditandoId = null;
   let investimentosCache = [];
   let usuarioAtualId = null;
-  let sincronizandoPendenciasAgora = false;
-  let ultimaFalhaSincronizacao = null;
 
   const DB_NAME = 'gestao-investimentos-db';
   const DB_VERSION = 1;
@@ -136,34 +134,22 @@ document.addEventListener('DOMContentLoaded', () => {
       atualizarStatusSincronizacao('offline', `Offline • Pendências: ${pendencias.length}`);
       return;
     }
-    if (ultimaFalhaSincronizacao && pendencias.length) {
-      atualizarStatusSincronizacao('offline', 'Erro ao sincronizar pendências');
-      return;
-    }
     if (pendencias.length) {
-      if (sincronizandoPendenciasAgora) {
-        atualizarStatusSincronizacao('syncing', `Sincronizando (${pendencias.length})`);
-      } else {
-        atualizarStatusSincronizacao('online', `Pendências: ${pendencias.length}`);
-      }
+      atualizarStatusSincronizacao('syncing', `Sincronizando (${pendencias.length})`);
     } else {
       atualizarStatusSincronizacao('online', 'Sincronizado');
     }
   };
 
   const sincronizarPendencias = async () => {
-    if (!navigator.onLine || !usuarioAtualId || !suportaIndexedDb || sincronizandoPendenciasAgora) return;
-    sincronizandoPendenciasAgora = true;
-    ultimaFalhaSincronizacao = null;
+    if (!navigator.onLine || !usuarioAtualId || !suportaIndexedDb) return;
     let pendencias = [];
     try {
       pendencias = await obterPendencias(usuarioAtualId);
     } catch (error) {
-      sincronizandoPendenciasAgora = false;
       return;
     }
     if (!pendencias.length) {
-      sincronizandoPendenciasAgora = false;
       await atualizarStatusComPendencias();
       return;
     }
@@ -195,13 +181,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         await removerItem(STORE_PENDENCIAS, pendencia.id);
       } catch (error) {
-        ultimaFalhaSincronizacao = error;
-        sincronizandoPendenciasAgora = false;
         atualizarStatusSincronizacao('offline', 'Erro ao sincronizar pendências');
         return;
       }
     }
-    sincronizandoPendenciasAgora = false;
     await atualizarStatusComPendencias();
   };
 
