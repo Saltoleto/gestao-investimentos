@@ -11,20 +11,23 @@
 
 <body>
   <main class="container">
-    <h1>Controle de Investimentos</h1>
+    <header class="page-header">
+      <h1>Controle de Investimentos</h1>
+      <p class="subtitle">Acompanhe aportes, liquidez e vencimentos em um só lugar.</p>
+    </header>
 
     <!-- LOGIN -->
     <section id="auth" class="card auth-card">
       <h2>Entrar</h2>
       <div class="form-group">
-        <label>Email</label>
-        <input id="email" type="email" />
+        <label for="email">Email</label>
+        <input id="email" type="email" placeholder="voce@exemplo.com" />
       </div>
       <div class="form-group">
-        <label>Senha</label>
-        <input id="password" type="password" />
+        <label for="password">Senha</label>
+        <input id="password" type="password" placeholder="Digite sua senha" />
       </div>
-      <button id="btn-login" class="btn-primary">Entrar</button>
+      <button id="btn-login" class="btn btn-primary">Entrar</button>
       <p id="auth-error" class="error"></p>
     </section>
 
@@ -33,8 +36,8 @@
       <header class="app-header">
         <h2>Meus Investimentos</h2>
         <div class="header-buttons">
-          <button id="btn-novo" class="btn-primary small-btn">Novo</button>
-          <button id="btn-logout" class="btn-logout">Sair</button>
+          <button id="btn-novo" class="btn btn-primary small-btn">Novo</button>
+          <button id="btn-logout" class="btn btn-logout">Sair</button>
         </div>
       </header>
       <div id="lista" class="card"></div>
@@ -51,29 +54,29 @@
           <input type="hidden" id="aporte-id" />
 
           <div class="form-group">
-            <label>Valor</label>
-            <input id="valor" placeholder="R$ 0,00" />
+            <label for="valor">Valor</label>
+            <input id="valor" placeholder="R$ 0,00" inputmode="decimal" />
           </div>
 
           <div class="form-group autocomplete">
-            <label>Banco/Corretora</label>
+            <label for="banco-search">Banco/Corretora</label>
             <input type="text" id="banco-search" placeholder="Pesquisar banco..." autocomplete="off" />
             <ul id="banco-list" class="autocomplete-list"></ul>
           </div>
 
           <div class="form-group autocomplete">
-            <label>Tipo de Produto</label>
+            <label for="tipo">Tipo de Produto</label>
             <input type="text" id="tipo" placeholder="Pesquisar tipo..." autocomplete="off" />
             <ul id="tipo-list" class="autocomplete-list"></ul>
           </div>
 
           <div class="form-group">
-            <label>Descrição do Produto</label>
+            <label for="descricao">Descrição do Produto</label>
             <input id="descricao" placeholder="Ex: CDB, Ação, LCI..." />
           </div>
 
           <div class="form-group">
-            <label>Data do Aporte</label>
+            <label for="data">Data do Aporte</label>
             <input id="data" type="date" />
           </div>
 
@@ -87,13 +90,13 @@
 
 
           <div class="form-group">
-            <label>Vencimento</label>
+            <label for="vencimento">Vencimento</label>
             <input id="vencimento" type="date" />
           </div>
 
           <div class="form-buttons">
-            <button type="submit" class="btn-primary">Salvar</button>
-            <button type="button" id="btn-cancelar" class="btn-cancel">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Salvar</button>
+            <button type="button" id="btn-cancelar" class="btn btn-cancel">Cancelar</button>
           </div>
 
           <p id="form-error" class="error"></p>

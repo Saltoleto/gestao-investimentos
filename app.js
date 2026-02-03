@@ -123,16 +123,39 @@ document.addEventListener('DOMContentLoaded', () => {
     data.forEach(i => {
       const div = document.createElement('div'); div.className = 'investimento-card';
       div.innerHTML = `
-        Banco/Corretora: ${i.banco}<br/>
-        Produto: ${i.tipo_produto}<br/>
-        Descrição: ${i.descricao_produto || '-'}<br/>
-        Valor: ${formatarMoeda(i.valor)}<br/>
-        Data de Aporte: ${formatarDataBR(i.data_aporte)}<br/>
-        Liquidez: ${i.liquidez}<br/>                
-        Data de Vencimento: ${i.data_vencimento ? formatarDataBR(i.data_vencimento) : '-'}
+        <div class="investimento-content">
+          <div>
+            <span class="label">Banco/Corretora</span>
+            <span class="value">${i.banco}</span>
+          </div>
+          <div>
+            <span class="label">Produto</span>
+            <span class="value">${i.tipo_produto}</span>
+          </div>
+          <div>
+            <span class="label">Descrição</span>
+            <span class="value">${i.descricao_produto || '-'}</span>
+          </div>
+          <div>
+            <span class="label">Valor</span>
+            <span class="value destaque">${formatarMoeda(i.valor)}</span>
+          </div>
+          <div>
+            <span class="label">Data de Aporte</span>
+            <span class="value">${formatarDataBR(i.data_aporte)}</span>
+          </div>
+          <div>
+            <span class="label">Liquidez</span>
+            <span class="value badge">${i.liquidez}</span>
+          </div>
+          <div>
+            <span class="label">Data de Vencimento</span>
+            <span class="value">${i.data_vencimento ? formatarDataBR(i.data_vencimento) : '-'}</span>
+          </div>
+        </div>
         <div class="investimento-acoes">
-          <button class="btn-editar">Editar</button>
-          <button class="btn-excluir">Excluir</button>
+          <button class="btn btn-editar">Editar</button>
+          <button class="btn btn-excluir">Excluir</button>
         </div>
       `;
       div.querySelector('.btn-editar').addEventListener('click', () => {
