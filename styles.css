@@ -1,0 +1,159 @@
+* {
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 16px;
+  background: #f4f6fb;
+}
+
+/* CONTAINER */
+.container {
+  max-width: 900px;
+  margin: auto;
+}
+
+/* CARDS */
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.card-spacing {
+  margin-bottom: 24px;
+}
+
+.auth-card {
+  max-width: 360px;
+  margin: 40px auto;
+}
+
+/* FORM */
+.form-group {
+  margin-bottom: 12px;
+}
+
+label {
+  font-weight: bold;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 4px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* BOTÕES PRINCIPAIS */
+.btn-primary, .btn-cancel {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  border: none;
+}
+
+.btn-primary {
+  background: #667eea;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #5a67d8;
+}
+
+.btn-cancel {
+  background: #718096;
+  color: white;
+  margin-top: 8px;
+}
+
+.btn-cancel:hover {
+  background: #4a5568;
+}
+
+/* BOTÃO LOGOUT */
+.btn-logout {
+  background: #e53e3e;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* HEADER APP */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+/* LISTA DE INVESTIMENTOS */
+.investimento-card {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+  position: relative;
+}
+
+/* AÇÕES DO INVESTIMENTO */
+.investimento-acoes {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+}
+
+.investimento-acoes button {
+  flex: 1;
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+.investimento-acoes .btn-editar {
+  background: #38a169;
+  color: white;
+}
+
+.investimento-acoes .btn-editar:hover {
+  background: #2f855a;
+}
+
+.investimento-acoes .btn-excluir {
+  background: #e53e3e;
+  color: white;
+}
+
+.investimento-acoes .btn-excluir:hover {
+  background: #c53030;
+}
+
+/* FEEDBACK */
+.error {
+  color: #e53e3e;
+  margin-top: 8px;
+}
+
+.hidden {
+  display: none;
+}
+
+/* RESPONSIVO */
+@media (min-width: 768px) {
+  .container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+}
