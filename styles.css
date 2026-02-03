@@ -18,7 +18,7 @@ body {
   background: white;
   padding: 20px;
   border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
 .card-spacing {
@@ -32,16 +32,18 @@ body {
 
 .form-group {
   margin-bottom: 12px;
+  position: relative;
 }
 
 label {
   font-weight: bold;
+  display: block;
+  margin-bottom: 4px;
 }
 
 input {
   width: 100%;
   padding: 10px;
-  margin-top: 4px;
   border-radius: 6px;
   border: 1px solid #ccc;
 }
@@ -64,6 +66,7 @@ input {
   padding: 0;
   margin: 0;
   list-style: none;
+  display: none;
 }
 
 .autocomplete-list li {
@@ -128,6 +131,13 @@ input {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
 }
 
 .investimento-card {
@@ -181,6 +191,19 @@ input {
   margin-top: 8px;
 }
 
+.info {
+  color: #4a5568;
+  font-style: italic;
+  text-align: center;
+  margin-top: 12px;
+}
+
+.radio-group {
+  display: flex;
+  gap: 16px;
+  margin-top: 4px;
+}
+
 .hidden {
   display: none;
 }
@@ -191,4 +214,23 @@ input {
     grid-template-columns: 1fr 1fr;
     gap: 24px;
   }
+
+  .header-buttons {
+    margin-top: 0;
+  }
+}
+
+.radio-inline {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-top: 4px;
+  outline: auto
+}
+
+.radio-inline label {
+  font-weight: normal;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
