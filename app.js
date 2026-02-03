@@ -52,8 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const STORE_INVESTIMENTOS = 'investimentos';
   const STORE_PENDENCIAS = 'pendencias';
   const suportaIndexedDb = 'indexedDB' in window;
-  const SYNC_LOCK_KEY = 'gestao-investimentos-sync-lock';
-  const SYNC_LOCK_TTL = 60000;
 
   const abrirBanco = () =>
     new Promise((resolve, reject) => {
@@ -114,39 +112,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const gerarIdLocal = () => `local-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`;
   const ehIdLocal = id => typeof id === 'string' && id.startsWith('local-');
-  const syncTabId = gerarIdLocal();
 
   const atualizarStatusSincronizacao = (status, mensagem) => {
     if (!syncStatus) return;
     syncStatus.className = `sync-status ${status}`;
     syncStatus.textContent = mensagem;
-  };
-
-  const adquirirLockSincronizacao = () => {
-    if (!('localStorage' in window)) return true;
-    const now = Date.now();
-    try {
-      const lockAtual = JSON.parse(localStorage.getItem(SYNC_LOCK_KEY) || 'null');
-      if (lockAtual && lockAtual.tabId !== syncTabId && now - lockAtual.timestamp < SYNC_LOCK_TTL) {
-        return false;
-      }
-    } catch (error) {
-      // ignore malformed lock data
-    }
-    localStorage.setItem(SYNC_LOCK_KEY, JSON.stringify({ tabId: syncTabId, timestamp: now }));
-    return true;
-  };
-
-  const liberarLockSincronizacao = () => {
-    if (!('localStorage' in window)) return;
-    try {
-      const lockAtual = JSON.parse(localStorage.getItem(SYNC_LOCK_KEY) || 'null');
-      if (lockAtual?.tabId === syncTabId) {
-        localStorage.removeItem(SYNC_LOCK_KEY);
-      }
-    } catch (error) {
-      localStorage.removeItem(SYNC_LOCK_KEY);
-    }
   };
 
   const obterUsuarioSessao = async () => {
@@ -198,21 +168,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const sincronizarPendencias = async () => {
     if (!navigator.onLine || !usuarioAtualId || !suportaIndexedDb || sincronizandoPendenciasAgora) return;
-    if (!adquirirLockSincronizacao()) return;
     sincronizandoPendenciasAgora = true;
     ultimaFalhaSincronizacao = null;
     let pendencias = [];
     try {
       pendencias = await obterPendencias(usuarioAtualId);
     } catch (error) {
-      liberarLockSincronizacao();
       sincronizandoPendenciasAgora = false;
       return;
     }
     if (!pendencias.length) {
       sincronizandoPendenciasAgora = false;
       await atualizarStatusComPendencias();
-      liberarLockSincronizacao();
       return;
     }
     atualizarStatusSincronizacao('syncing', `Sincronizando (${pendencias.length})`);
@@ -246,13 +213,11 @@ document.addEventListener('DOMContentLoaded', () => {
         ultimaFalhaSincronizacao = error;
         sincronizandoPendenciasAgora = false;
         atualizarStatusSincronizacao('offline', 'Erro ao sincronizar pendências');
-        liberarLockSincronizacao();
         return;
       }
     }
     sincronizandoPendenciasAgora = false;
     await atualizarStatusComPendencias();
-    liberarLockSincronizacao();
   };
 
   const substituirCacheInvestimentos = async (userId, investimentos) => {
