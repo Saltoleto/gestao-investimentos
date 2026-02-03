@@ -126,10 +126,10 @@ document.addEventListener('DOMContentLoaded', () => {
         Banco/Corretora: ${i.banco}<br/>
         Produto: ${i.tipo_produto}<br/>
         Descrição: ${i.descricao_produto || '-'}<br/>
-        Liquidez: ${i.liquidez}<br/>
         Valor: ${formatarMoeda(i.valor)}<br/>
-        Aporte: ${formatarDataBR(i.data_aporte)}<br/>
-        Vencimento: ${i.data_vencimento ? formatarDataBR(i.data_vencimento) : '-'}
+        Data de Aporte: ${formatarDataBR(i.data_aporte)}<br/>
+        Liquidez: ${i.liquidez}<br/>                
+        Data de Vencimento: ${i.data_vencimento ? formatarDataBR(i.data_vencimento) : '-'}
         <div class="investimento-acoes">
           <button class="btn-editar">Editar</button>
           <button class="btn-excluir">Excluir</button>
