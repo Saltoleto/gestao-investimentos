@@ -31,6 +31,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const formSuccess = document.getElementById('form-success');
   const liquidezRadios = document.querySelectorAll('input[name="liquidez"]');
 
+  if (!supabase) {
+    const authError = document.getElementById('auth-error');
+    authError.innerText = 'Não foi possível carregar o Supabase. Verifique sua conexão e tente novamente.';
+    btnLogin.disabled = true;
+    return;
+  }
+
   const bancos = ["Banco do Brasil", "Bradesco", "BTG Pactual", "Caixa Econômica Federal", "Itaú", "Inter", "Nubank", "Original", "Rico", "Santander", "Safra", "XP"].sort();
   const tiposProdutos = ["CDB", "LCI", "LCA", "Tesouro Direto", "Fundos de Renda Fixa", "Ações", "ETFs", "Fundos Imobiliários", "Debêntures", "CRI/CRA"].sort();
   let investimentoEditandoId = null;
