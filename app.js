@@ -30,7 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const formError = document.getElementById('form-error');
   const formSuccess = document.getElementById('form-success');
   const liquidezRadios = document.querySelectorAll('input[name="liquidez"]');
-  const syncStatus = document.getElementById('sync-status');
 
   if (!supabase) {
     const authError = document.getElementById('auth-error');
@@ -43,193 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const tiposProdutos = ["CDB", "LCI", "LCA", "Tesouro Direto", "Fundos de Renda Fixa", "Ações", "ETFs", "Fundos Imobiliários", "Debêntures", "CRI/CRA"].sort();
   let investimentoEditandoId = null;
   let investimentosCache = [];
-  let usuarioAtualId = null;
-
-  const DB_NAME = 'gestao-investimentos-db';
-  const DB_VERSION = 1;
-  const STORE_INVESTIMENTOS = 'investimentos';
-  const STORE_PENDENCIAS = 'pendencias';
-  const suportaIndexedDb = 'indexedDB' in window;
-
-  const abrirBanco = () =>
-    new Promise((resolve, reject) => {
-      if (!suportaIndexedDb) {
-        reject(new Error('IndexedDB indisponível'));
-        return;
-      }
-      const request = indexedDB.open(DB_NAME, DB_VERSION);
-      request.onupgradeneeded = () => {
-        const db = request.result;
-        if (!db.objectStoreNames.contains(STORE_INVESTIMENTOS)) {
-          const investimentosStore = db.createObjectStore(STORE_INVESTIMENTOS, { keyPath: 'id' });
-          investimentosStore.createIndex('usuario_id', 'usuario_id', { unique: false });
-        }
-        if (!db.objectStoreNames.contains(STORE_PENDENCIAS)) {
-          const pendenciasStore = db.createObjectStore(STORE_PENDENCIAS, { keyPath: 'id' });
-          pendenciasStore.createIndex('usuario_id', 'usuario_id', { unique: false });
-        }
-      };
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
-    });
-
-  const obterPorIndice = async (storeName, indexName, value) => {
-    const db = await abrirBanco();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(storeName, 'readonly');
-      const store = tx.objectStore(storeName);
-      const index = store.index(indexName);
-      const request = index.getAll(value);
-      request.onsuccess = () => resolve(request.result || []);
-      request.onerror = () => reject(request.error);
-    });
-  };
-
-  const salvarItem = async (storeName, item) => {
-    const db = await abrirBanco();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(storeName, 'readwrite');
-      tx.objectStore(storeName).put(item);
-      tx.oncomplete = () => resolve();
-      tx.onerror = () => reject(tx.error);
-    });
-  };
-
-  const removerItem = async (storeName, key) => {
-    const db = await abrirBanco();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(storeName, 'readwrite');
-      tx.objectStore(storeName).delete(key);
-      tx.oncomplete = () => resolve();
-      tx.onerror = () => reject(tx.error);
-    });
-  };
-
-  const obterInvestimentosCache = async userId => obterPorIndice(STORE_INVESTIMENTOS, 'usuario_id', userId);
-  const obterPendencias = async userId => obterPorIndice(STORE_PENDENCIAS, 'usuario_id', userId);
-
-  const gerarIdLocal = () => `local-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`;
-  const ehIdLocal = id => typeof id === 'string' && id.startsWith('local-');
-
-  const atualizarStatusSincronizacao = (status, mensagem) => {
-    if (!syncStatus) return;
-    syncStatus.className = `sync-status ${status}`;
-    syncStatus.textContent = mensagem;
-  };
-
-  const atualizarStatusComPendencias = async () => {
-    if (!usuarioAtualId) {
-      atualizarStatusSincronizacao(navigator.onLine ? 'online' : 'offline', navigator.onLine ? 'Online' : 'Offline');
-      return;
-    }
-    let pendencias = [];
-    if (suportaIndexedDb) {
-      try {
-        pendencias = await obterPendencias(usuarioAtualId);
-      } catch (error) {
-        pendencias = [];
-      }
-    }
-    if (!navigator.onLine) {
-      atualizarStatusSincronizacao('offline', `Offline • Pendências: ${pendencias.length}`);
-      return;
-    }
-    if (pendencias.length) {
-      atualizarStatusSincronizacao('syncing', `Sincronizando (${pendencias.length})`);
-    } else {
-      atualizarStatusSincronizacao('online', 'Sincronizado');
-    }
-  };
-
-  const sincronizarPendencias = async () => {
-    if (!navigator.onLine || !usuarioAtualId || !suportaIndexedDb) return;
-    let pendencias = [];
-    try {
-      pendencias = await obterPendencias(usuarioAtualId);
-    } catch (error) {
-      return;
-    }
-    if (!pendencias.length) {
-      await atualizarStatusComPendencias();
-      return;
-    }
-    atualizarStatusSincronizacao('syncing', `Sincronizando (${pendencias.length})`);
-    pendencias = pendencias.sort((a, b) => a.criado_em - b.criado_em);
-    for (const pendencia of pendencias) {
-      try {
-        if (pendencia.tipo === 'insert') {
-          const { data, error } = await supabase
-            .from('investimentos')
-            .insert(pendencia.payload)
-            .select()
-            .single();
-          if (error) throw error;
-          await removerItem(STORE_INVESTIMENTOS, pendencia.local_id);
-          await salvarItem(STORE_INVESTIMENTOS, data);
-        }
-        if (pendencia.tipo === 'update') {
-          const { error } = await supabase
-            .from('investimentos')
-            .update(pendencia.payload)
-            .eq('id', pendencia.remote_id);
-          if (error) throw error;
-          await salvarItem(STORE_INVESTIMENTOS, { ...pendencia.payload, id: pendencia.remote_id, usuario_id: pendencia.usuario_id });
-        }
-        if (pendencia.tipo === 'delete') {
-          const { error } = await supabase.from('investimentos').delete().eq('id', pendencia.remote_id);
-          if (error) throw error;
-        }
-        await removerItem(STORE_PENDENCIAS, pendencia.id);
-      } catch (error) {
-        atualizarStatusSincronizacao('offline', 'Erro ao sincronizar pendências');
-        return;
-      }
-    }
-    await atualizarStatusComPendencias();
-  };
-
-  const substituirCacheInvestimentos = async (userId, investimentos) => {
-    if (!suportaIndexedDb) return;
-    let atuais = [];
-    try {
-      atuais = await obterInvestimentosCache(userId);
-    } catch (error) {
-      return;
-    }
-    await Promise.all(
-      atuais
-        .filter(item => item.usuario_id === userId && !ehIdLocal(item.id))
-        .map(item => removerItem(STORE_INVESTIMENTOS, item.id))
-    );
-    await Promise.all(investimentos.map(item => salvarItem(STORE_INVESTIMENTOS, item)));
-  };
-
-  const encontrarPendenciaInsert = async localId => {
-    if (!suportaIndexedDb || !usuarioAtualId) return null;
-    const pendencias = await obterPendencias(usuarioAtualId);
-    return pendencias.find(pendencia => pendencia.tipo === 'insert' && pendencia.local_id === localId) || null;
-  };
-
-  const removerPendenciaPorLocalId = async localId => {
-    const pendencia = await encontrarPendenciaInsert(localId);
-    if (pendencia) {
-      await removerItem(STORE_PENDENCIAS, pendencia.id);
-    }
-  };
-
-  const carregarInvestimentosDoCache = async userId => {
-    if (!suportaIndexedDb) return [];
-    let dados = [];
-    try {
-      dados = await obterInvestimentosCache(userId);
-    } catch (error) {
-      return [];
-    }
-    investimentosCache = dados || [];
-    atualizarFiltrosComDados(investimentosCache);
-    aplicarFiltros();
-    return dados;
-  };
 
   const formatarDataBR = d => d ? d.split('T')[0].split('-').reverse().join('/') : '';
   const formatarMoeda = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -332,16 +144,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (error) { document.getElementById('auth-error').innerText = error.message; return; }
     const { data: sessionData } = await supabase.auth.getSession();
     if (sessionData.session) {
-      usuarioAtualId = sessionData.session.user.id;
       authDiv.classList.add('hidden'); listaSection.classList.remove('hidden'); formSection.classList.add('hidden'); carregarInvestimentos();
     } else document.getElementById('auth-error').innerText = 'Falha ao autenticar';
   });
 
   btnLogout.addEventListener('click', async () => {
     await supabase.auth.signOut();
-    usuarioAtualId = null;
     authDiv.classList.remove('hidden'); listaSection.classList.add('hidden'); formSection.classList.add('hidden');
-    atualizarStatusComPendencias();
   });
 
   // NOVO
@@ -416,24 +225,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       div.querySelector('.btn-excluir').addEventListener('click', async () => {
         if (!confirm('Deseja excluir este investimento?')) return;
-        if (!navigator.onLine) {
-          if (ehIdLocal(i.id)) {
-            await removerItem(STORE_INVESTIMENTOS, i.id);
-            await removerPendenciaPorLocalId(i.id);
-          } else {
-            await removerItem(STORE_INVESTIMENTOS, i.id);
-            await salvarItem(STORE_PENDENCIAS, {
-              id: gerarIdLocal(),
-              tipo: 'delete',
-              remote_id: i.id,
-              usuario_id: usuarioAtualId,
-              criado_em: Date.now()
-            });
-          }
-          await carregarInvestimentosDoCache(usuarioAtualId);
-          await atualizarStatusComPendencias();
-          return;
-        }
         const { error } = await supabase.from('investimentos').delete().eq('id', i.id);
         if (!error) carregarInvestimentos();
       });
@@ -614,27 +405,13 @@ document.addEventListener('DOMContentLoaded', () => {
     lista.innerHTML = '';
     const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) return;
-    usuarioAtualId = userData.user.id;
-
-    if (suportaIndexedDb) {
-      await carregarInvestimentosDoCache(usuarioAtualId);
-    }
-
-    if (!navigator.onLine) {
-      await atualizarStatusComPendencias();
-      return;
-    }
-
-    await sincronizarPendencias();
 
     const { data, error } = await supabase.from('investimentos').select('*').eq('usuario_id', userData.user.id).order('data_aporte', { ascending: false });
     if (error) { lista.innerHTML = '<p class="error">Erro ao carregar investimentos</p>'; return; }
 
     investimentosCache = data || [];
-    await substituirCacheInvestimentos(usuarioAtualId, investimentosCache);
     atualizarFiltrosComDados(investimentosCache);
     aplicarFiltros();
-    await atualizarStatusComPendencias();
   }
 
   // SALVAR / ATUALIZAR
@@ -647,55 +424,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const liquidez = document.querySelector('input[name="liquidez"]:checked').value;
     if (liquidez === 'No vencimento' && !vencimentoInput.value) { formError.innerText = 'Data de Vencimento obrigatória'; return; }
 
-    const payloadBase = { banco: bancoSearch.value, tipo_produto: tipoInput.value, descricao_produto: descricaoInput.value, valor, liquidez, data_aporte: dataInput.value, 
+    const payload = { banco: bancoSearch.value, tipo_produto: tipoInput.value, descricao_produto: descricaoInput.value, valor, liquidez, data_aporte: dataInput.value, 
       data_vencimento: liquidez === 'No vencimento' ? vencimentoInput.value : null
     };
-    const usuarioId = userData.user.id;
-
-    if (!navigator.onLine) {
-      if (investimentoEditandoId) {
-        const itemAtualizado = { ...payloadBase, id: investimentoEditandoId, usuario_id: usuarioId };
-        await salvarItem(STORE_INVESTIMENTOS, itemAtualizado);
-        if (ehIdLocal(investimentoEditandoId)) {
-          const pendencia = await encontrarPendenciaInsert(investimentoEditandoId);
-          if (pendencia) {
-            await salvarItem(STORE_PENDENCIAS, { ...pendencia, payload: { ...payloadBase, usuario_id: usuarioId } });
-          }
-        } else {
-          await salvarItem(STORE_PENDENCIAS, {
-            id: gerarIdLocal(),
-            tipo: 'update',
-            remote_id: investimentoEditandoId,
-            payload: payloadBase,
-            usuario_id: usuarioId,
-            criado_em: Date.now()
-          });
-        }
-      } else {
-        const idLocal = gerarIdLocal();
-        const novoItem = { ...payloadBase, id: idLocal, usuario_id: usuarioId };
-        await salvarItem(STORE_INVESTIMENTOS, novoItem);
-        await salvarItem(STORE_PENDENCIAS, {
-          id: gerarIdLocal(),
-          tipo: 'insert',
-          local_id: idLocal,
-          payload: { ...payloadBase, usuario_id: usuarioId },
-          usuario_id: usuarioId,
-          criado_em: Date.now()
-        });
-      }
-      investimentoEditandoId = null; form.reset(); bancoSearch.value = ''; tipoInput.value = ''; descricaoInput.value = '';
-      btnSubmit.innerText = 'Salvar'; document.getElementById('form-title').innerText = 'Novo';
-      formSection.classList.add('hidden'); listaSection.classList.remove('hidden'); formSuccess.innerText = 'Investimento salvo localmente. Sincroniza quando estiver online.';
-      atualizarVencimento();
-      await carregarInvestimentosDoCache(usuarioId);
-      await atualizarStatusComPendencias();
-      return;
-    }
-
     let error;
-    if (investimentoEditandoId) ({ error } = await supabase.from('investimentos').update(payloadBase).eq('id', investimentoEditandoId));
-    else ({ error } = await supabase.from('investimentos').insert({ ...payloadBase, usuario_id: usuarioId }));
+    if (investimentoEditandoId) ({ error } = await supabase.from('investimentos').update(payload).eq('id', investimentoEditandoId));
+    else { payload.usuario_id = userData.user.id; ({ error } = await supabase.from('investimentos').insert(payload)); }
 
     if (error) formError.innerText = error.message;
     else {
@@ -710,22 +444,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // AUTO LOAD
   (async () => {
     const { data: sessionData } = await supabase.auth.getSession();
-    if (sessionData.session) {
-      usuarioAtualId = sessionData.session.user.id;
-      authDiv.classList.add('hidden'); listaSection.classList.remove('hidden'); carregarInvestimentos();
-    } else {
-      atualizarStatusComPendencias();
-    }
+    if (sessionData.session) { authDiv.classList.add('hidden'); listaSection.classList.remove('hidden'); carregarInvestimentos(); }
   })();
-
-  window.addEventListener('online', () => {
-    atualizarStatusComPendencias();
-    sincronizarPendencias().then(() => carregarInvestimentos());
-  });
-
-  window.addEventListener('offline', () => {
-    atualizarStatusComPendencias();
-  });
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
