@@ -560,6 +560,6 @@ select:focus {
   }
 
   .totais-card-wide {
-    grid-column: span 2;
+    grid-column: span 3;
   }
 }
