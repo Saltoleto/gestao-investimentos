@@ -322,7 +322,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const percentualLiquidezVencimento = totalValor ? (totalLiquidezVencimento / totalValor) * 100 : 0;
 
     const resumoCard = document.createElement('div');
-    resumoCard.className = 'totais-card';
+    resumoCard.className = 'totais-card totais-card-wide';
     resumoCard.innerHTML = `
       <h3>Resumo geral</h3>
       <div class="totais-resumo">
