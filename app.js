@@ -287,7 +287,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const totalValor = investimentos.reduce((acc, item) => acc + (item.valor || 0), 0);
     const totalQuantidade = investimentos.length;
-    const ticketMedio = totalQuantidade ? totalValor / totalQuantidade : 0;
+    const rendaFixaTipos = new Set([
+      'cdb',
+      'lci',
+      'lca',
+      'tesouro direto',
+      'fundos de renda fixa',
+      'debêntures',
+      'debentures',
+      'cri/cra'
+    ]);
+    const rendaVariavelTipos = new Set(['ações', 'acoes', 'etfs', 'fundos imobiliários', 'fundos imobiliarios']);
+    const totalRendaFixa = investimentos.reduce((acc, item) => {
+      const tipo = (item.tipo_produto || '').toLowerCase();
+      if (rendaFixaTipos.has(tipo)) return acc + (item.valor || 0);
+      return acc;
+    }, 0);
+    const totalRendaVariavel = investimentos.reduce((acc, item) => {
+      const tipo = (item.tipo_produto || '').toLowerCase();
+      if (rendaVariavelTipos.has(tipo)) return acc + (item.valor || 0);
+      return acc;
+    }, 0);
+    const percentualRendaFixa = totalValor ? (totalRendaFixa / totalValor) * 100 : 0;
+    const percentualRendaVariavel = totalValor ? (totalRendaVariavel / totalValor) * 100 : 0;
 
     const resumoCard = document.createElement('div');
     resumoCard.className = 'totais-card';
@@ -302,13 +324,32 @@ document.addEventListener('DOMContentLoaded', () => {
           <span>Quantidade de investimentos</span>
           <strong>${totalQuantidade}</strong>
         </div>
-        <div class="totais-kpi">
-          <span>Ticket médio</span>
-          <strong>${formatarMoeda(ticketMedio)}</strong>
-        </div>
       </div>
     `;
     totaisSection.appendChild(resumoCard);
+
+    const concentracaoCard = document.createElement('div');
+    concentracaoCard.className = 'totais-card';
+    concentracaoCard.innerHTML = `
+      <h3>Concentração por classe</h3>
+      <div class="totais-concentracao">
+        <div class="totais-concentracao-item">
+          <span>Renda fixa</span>
+          <strong>${percentualRendaFixa.toFixed(1)}%</strong>
+          <small>${formatarMoeda(totalRendaFixa)}</small>
+        </div>
+        <div class="totais-concentracao-item">
+          <span>Renda variável</span>
+          <strong>${percentualRendaVariavel.toFixed(1)}%</strong>
+          <small>${formatarMoeda(totalRendaVariavel)}</small>
+        </div>
+        <div class="totais-concentracao-bar" role="img" aria-label="Concentração: ${percentualRendaFixa.toFixed(1)}% renda fixa, ${percentualRendaVariavel.toFixed(1)}% renda variável">
+          <div class="totais-concentracao-fill fixa" style="width: ${percentualRendaFixa}%;"></div>
+          <div class="totais-concentracao-fill variavel" style="width: ${percentualRendaVariavel}%;"></div>
+        </div>
+      </div>
+    `;
+    totaisSection.appendChild(concentracaoCard);
 
     const gruposBanco = ordenarGrupos(agruparInvestimentos(investimentos, 'banco'));
     const gruposTipo = ordenarGrupos(agruparInvestimentos(investimentos, 'tipo_produto'));
