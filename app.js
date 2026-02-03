@@ -343,12 +343,12 @@ document.addEventListener('DOMContentLoaded', () => {
     concentracaoCard.innerHTML = `
       <h3>Concentração por classe</h3>
       <div class="totais-concentracao">
-        <div class="totais-concentracao-item">
+        <div class="totais-concentracao-item fixa">
           <span>Renda fixa</span>
           <strong>${percentualRendaFixa.toFixed(1)}%</strong>
           <small>${formatarMoeda(totalRendaFixa)}</small>
         </div>
-        <div class="totais-concentracao-item">
+        <div class="totais-concentracao-item variavel">
           <span>Renda variável</span>
           <strong>${percentualRendaVariavel.toFixed(1)}%</strong>
           <small>${formatarMoeda(totalRendaVariavel)}</small>
@@ -366,19 +366,19 @@ document.addEventListener('DOMContentLoaded', () => {
     concentracaoLiquidezCard.innerHTML = `
       <h3>Concentração por liquidez</h3>
       <div class="totais-concentracao">
-        <div class="totais-concentracao-item">
+        <div class="totais-concentracao-item diaria">
           <span>Diária</span>
           <strong>${percentualLiquidezDiaria.toFixed(1)}%</strong>
           <small>${formatarMoeda(totalLiquidezDiaria)}</small>
         </div>
-        <div class="totais-concentracao-item">
+        <div class="totais-concentracao-item vencimento">
           <span>No vencimento</span>
           <strong>${percentualLiquidezVencimento.toFixed(1)}%</strong>
           <small>${formatarMoeda(totalLiquidezVencimento)}</small>
         </div>
         <div class="totais-concentracao-bar" role="img" aria-label="Concentração por liquidez: ${percentualLiquidezDiaria.toFixed(1)}% diária, ${percentualLiquidezVencimento.toFixed(1)}% no vencimento">
-          <div class="totais-concentracao-fill fixa" style="width: ${percentualLiquidezDiaria}%;"></div>
-          <div class="totais-concentracao-fill variavel" style="width: ${percentualLiquidezVencimento}%;"></div>
+          <div class="totais-concentracao-fill diaria" style="width: ${percentualLiquidezDiaria}%;"></div>
+          <div class="totais-concentracao-fill vencimento" style="width: ${percentualLiquidezVencimento}%;"></div>
         </div>
       </div>
     `;
