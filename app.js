@@ -11,6 +11,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnLogout = document.getElementById('btn-logout');
   const btnNovo = document.getElementById('btn-novo');
   const btnCancelar = document.getElementById('btn-cancelar');
+  const filtroBanco = document.getElementById('filtro-banco');
+  const filtroTipo = document.getElementById('filtro-tipo');
+  const filtroLiquidez = document.getElementById('filtro-liquidez');
+  const btnLimparFiltros = document.getElementById('btn-limpar-filtros');
 
   const emailInput = document.getElementById('email');
   const passwordInput = document.getElementById('password');
@@ -29,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const bancos = ["Banco do Brasil", "Bradesco", "BTG Pactual", "Caixa Econômica Federal", "Itaú", "Inter", "Nubank", "Original", "Rico", "Santander", "Safra", "XP"].sort();
   const tiposProdutos = ["CDB", "LCI", "LCA", "Tesouro Direto", "Fundos de Renda Fixa", "Ações", "ETFs", "Fundos Imobiliários", "Debêntures", "CRI/CRA"].sort();
   let investimentoEditandoId = null;
+  let investimentosCache = [];
 
   const formatarDataBR = d => d ? d.split('T')[0].split('-').reverse().join('/') : '';
   const formatarMoeda = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -63,6 +68,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
   setupAutocomplete(bancoSearch, bancoList, bancos);
   setupAutocomplete(tipoInput, tipoList, tiposProdutos);
+
+  function atualizarOpcoesSelect(select, options, defaultLabel) {
+    const valorAtual = select.value;
+    select.innerHTML = `<option value="">${defaultLabel}</option>`;
+    options.forEach(opcao => {
+      const option = document.createElement('option');
+      option.value = opcao;
+      option.textContent = opcao;
+      select.appendChild(option);
+    });
+    select.value = options.includes(valorAtual) ? valorAtual : '';
+  }
+
+  function atualizarFiltrosComDados(dados) {
+    const bancosDisponiveis = Array.from(new Set([...bancos, ...dados.map(item => item.banco).filter(Boolean)])).sort();
+    const tiposDisponiveis = Array.from(new Set([...tiposProdutos, ...dados.map(item => item.tipo_produto).filter(Boolean)])).sort();
+    atualizarOpcoesSelect(filtroBanco, bancosDisponiveis, 'Todos');
+    atualizarOpcoesSelect(filtroTipo, tiposDisponiveis, 'Todos');
+  }
+
+  function aplicarFiltros() {
+    const bancoSelecionado = filtroBanco.value;
+    const tipoSelecionado = filtroTipo.value;
+    const liquidezSelecionada = filtroLiquidez.value;
+
+    const filtrados = investimentosCache.filter(item => {
+      const bancoOk = !bancoSelecionado || item.banco === bancoSelecionado;
+      const tipoOk = !tipoSelecionado || item.tipo_produto === tipoSelecionado;
+      const liquidezOk = !liquidezSelecionada || item.liquidez === liquidezSelecionada;
+      return bancoOk && tipoOk && liquidezOk;
+    });
+
+    renderizarInvestimentos(filtrados);
+  }
+
+  filtroBanco.addEventListener('change', aplicarFiltros);
+  filtroTipo.addEventListener('change', aplicarFiltros);
+  filtroLiquidez.addEventListener('change', aplicarFiltros);
+  btnLimparFiltros.addEventListener('click', () => {
+    filtroBanco.value = '';
+    filtroTipo.value = '';
+    filtroLiquidez.value = '';
+    aplicarFiltros();
+  });
 
   // HABILITA/DESABILITA VENCIMENTO SEGUNDO LIQUIDEZ
   function atualizarVencimento() {
@@ -111,16 +160,15 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // LISTAR INVESTIMENTOS
-  async function carregarInvestimentos() {
+  function renderizarInvestimentos(investimentos) {
     lista.innerHTML = '';
-    const { data: userData } = await supabase.auth.getUser();
-    if (!userData.user) return;
+    if (!investimentos.length) {
+      const mensagem = investimentosCache.length ? 'Nenhum investimento encontrado com os filtros atuais' : 'Nenhum investimento cadastrado';
+      lista.innerHTML = `<p class="info">${mensagem}</p>`;
+      return;
+    }
 
-    const { data, error } = await supabase.from('investimentos').select('*').eq('usuario_id', userData.user.id).order('data_aporte', { ascending: false });
-    if (error) { lista.innerHTML = '<p class="error">Erro ao carregar investimentos</p>'; return; }
-    if (!data.length) { lista.innerHTML = '<p class="info">Nenhum investimento cadastrado</p>'; return; }
-
-    data.forEach(i => {
+    investimentos.forEach(i => {
       const div = document.createElement('div'); div.className = 'investimento-card';
       div.innerHTML = `
         <div class="investimento-content">
@@ -173,6 +221,20 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       lista.appendChild(div);
     });
+  }
+
+  // LISTAR INVESTIMENTOS
+  async function carregarInvestimentos() {
+    lista.innerHTML = '';
+    const { data: userData } = await supabase.auth.getUser();
+    if (!userData.user) return;
+
+    const { data, error } = await supabase.from('investimentos').select('*').eq('usuario_id', userData.user.id).order('data_aporte', { ascending: false });
+    if (error) { lista.innerHTML = '<p class="error">Erro ao carregar investimentos</p>'; return; }
+
+    investimentosCache = data || [];
+    atualizarFiltrosComDados(investimentosCache);
+    aplicarFiltros();
   }
 
   // SALVAR / ATUALIZAR
