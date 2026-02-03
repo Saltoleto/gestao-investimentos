@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gestao-investimentos-v2';
+const CACHE_NAME = 'gestao-investimentos-v1';
 const ASSETS = [
   './',
   './index.html',
@@ -7,8 +7,7 @@ const ASSETS = [
   './supabase.js',
   './manifest.json',
   './icon-192.svg',
-  './icon-512.svg',
-  'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'
+  './icon-512.svg'
 ];
 
 self.addEventListener('install', event => {
@@ -34,7 +33,7 @@ self.addEventListener('fetch', event => {
     caches.match(event.request).then(cached =>
       cached ||
       fetch(event.request).then(response => {
-        if (!response || (response.status !== 200 && response.type !== 'opaque')) {
+        if (!response || response.status !== 200 || response.type !== 'basic') {
           return response;
         }
         const responseClone = response.clone();
