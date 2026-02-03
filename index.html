@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Controle de Aportes</title>
+
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <main class="container">
+    <h1>Controle de Aportes</h1>
+
+    <!-- LOGIN -->
+    <section id="auth" class="card auth-card">
+      <h2>Entrar</h2>
+
+      <div class="form-group">
+        <label>Email</label>
+        <input id="email" type="email" />
+      </div>
+
+      <div class="form-group">
+        <label>Senha</label>
+        <input id="password" type="password" />
+      </div>
+
+      <button id="btn-login" class="btn-primary">Entrar</button>
+      <p id="auth-error" class="error"></p>
+    </section>
+
+    <!-- APP -->
+    <section id="app" class="hidden">
+
+      <header class="app-header">
+        <h2>Novo / Editar Aporte</h2>
+        <button id="btn-logout" class="btn-logout">Sair</button>
+      </header>
+
+      <div class="card card-spacing">
+        <form id="form">
+          <input type="hidden" id="aporte-id" />
+
+          <div class="form-group">
+            <label>Valor</label>
+            <input id="valor" placeholder="R$ 0,00" />
+          </div>
+
+          <div class="form-group">
+            <label>Banco</label>
+            <input id="banco" />
+          </div>
+
+          <div class="form-group">
+            <label>Tipo de Produto</label>
+            <input id="tipo" />
+          </div>
+
+          <div class="form-group">
+            <label>Data do Aporte</label>
+            <input id="data" type="date" />
+          </div>
+
+          <div class="form-group">
+            <label>Vencimento</label>
+            <input id="vencimento" type="date" />
+          </div>
+
+          <button type="submit" class="btn-primary">Salvar Aporte</button>
+          <button type="button" id="btn-cancelar" class="btn-cancel hidden">Cancelar</button>
+
+          <p id="form-error" class="error"></p>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>Meus Investimentos</h2>
+        <div id="lista"></div>
+      </div>
+
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
