@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Controle de Investimentos</title>
-
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -32,7 +32,7 @@
     <section id="lista-section" class="hidden">
       <header class="app-header">
         <h2>Meus Investimentos</h2>
-        <div>
+        <div class="header-buttons">
           <button id="btn-novo" class="btn-primary small-btn">Novo</button>
           <button id="btn-logout" class="btn-logout">Sair</button>
         </div>
@@ -56,20 +56,35 @@
           </div>
 
           <div class="form-group autocomplete">
-            <label>Banco</label>
+            <label>Banco/Corretora</label>
             <input type="text" id="banco-search" placeholder="Pesquisar banco..." autocomplete="off" />
-            <ul id="banco-list" class="autocomplete-list hidden"></ul>
+            <ul id="banco-list" class="autocomplete-list"></ul>
+          </div>
+
+          <div class="form-group autocomplete">
+            <label>Tipo de Produto</label>
+            <input type="text" id="tipo" placeholder="Pesquisar tipo..." autocomplete="off" />
+            <ul id="tipo-list" class="autocomplete-list"></ul>
           </div>
 
           <div class="form-group">
-            <label>Tipo de Produto</label>
-            <input id="tipo" />
+            <label>Descrição do Produto</label>
+            <input id="descricao" placeholder="Ex: CDB, Ação, LCI..." />
           </div>
 
           <div class="form-group">
             <label>Data do Aporte</label>
             <input id="data" type="date" />
           </div>
+
+          <div class="form-group">
+            <label>Liquidez</label>
+            <div class="radio-inline">
+              <label><input type="radio" name="liquidez" value="Diária" />Diária</label>
+              <label><input type="radio" name="liquidez" value="No vencimento" checked />No vencimento</label>
+            </div>
+          </div>
+
 
           <div class="form-group">
             <label>Vencimento</label>
@@ -92,4 +107,5 @@
   <script src="supabase.js"></script>
   <script src="app.js"></script>
 </body>
+
 </html>
