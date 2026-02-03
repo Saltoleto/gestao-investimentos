@@ -387,6 +387,7 @@ select:focus {
   display: grid;
   gap: 20px;
   align-items: stretch;
+  margin: 20px 0;
 }
 
 .totais-card {
