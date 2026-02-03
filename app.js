@@ -364,7 +364,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const concentracaoLiquidezCard = document.createElement('div');
     concentracaoLiquidezCard.className = 'totais-card';
     concentracaoLiquidezCard.innerHTML = `
-      <h3>Concentração por liquidez (Novo %)</h3>
+      <h3>Concentração por liquidez</h3>
       <div class="totais-concentracao">
         <div class="totais-concentracao-item">
           <span>Diária</span>
@@ -388,9 +388,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const gruposTipo = ordenarGrupos(agruparInvestimentos(investimentos, 'tipo_produto'));
     const gruposLiquidez = ordenarGrupos(agruparInvestimentos(investimentos, 'liquidez'));
 
-    totaisSection.appendChild(criarTabelaTotais('Por tipo de produto', gruposTipo, 'Sem dados para tipos de produto.'));
-    totaisSection.appendChild(criarTabelaTotais('Por liquidez', gruposLiquidez, 'Sem dados para liquidez.'));
-    totaisSection.appendChild(criarTabelaTotais('Por banco/corretora', gruposBanco, 'Sem dados para bancos/corretoras.'));
+    totaisSection.appendChild(criarTabelaTotais('Quantidade por tipo de produto', gruposTipo, 'Sem dados para tipos de produto.'));
+    totaisSection.appendChild(criarTabelaTotais('Quantidade por liquidez', gruposLiquidez, 'Sem dados para liquidez.'));
+    totaisSection.appendChild(criarTabelaTotais('Quantidade por banco/corretora', gruposBanco, 'Sem dados para bancos/corretoras.'));
   }
 
   // LISTAR INVESTIMENTOS
