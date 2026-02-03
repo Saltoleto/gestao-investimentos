@@ -46,6 +46,17 @@ body {
   font-size: 28px;
 }
 
+.page-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+}
+
+.page-title-icon {
+  font-size: 28px;
+}
+
 .subtitle {
   margin: 0;
   color: var(--muted);
@@ -225,12 +236,23 @@ select:focus {
   align-items: center;
   margin-bottom: 16px;
   flex-wrap: wrap;
+  gap: 16px;
+}
+
+.header-title h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.header-title .subtitle {
+  margin-top: 4px;
 }
 
 .header-buttons {
   display: flex;
   gap: 12px;
   margin-top: 8px;
+  flex-wrap: wrap;
 }
 
 .investimento-card {
