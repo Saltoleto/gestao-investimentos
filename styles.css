@@ -398,6 +398,10 @@ select:focus {
   box-shadow: var(--shadow);
 }
 
+.totais-card-wide {
+  min-width: 0;
+}
+
 .totais-card h3 {
   margin: 0 0 12px;
   font-size: 16px;
@@ -416,7 +420,7 @@ select:focus {
 
 .totais-concentracao-item {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 72px 120px;
+  grid-template-columns: minmax(0, 1fr) minmax(64px, max-content) minmax(96px, max-content);
   align-items: center;
   column-gap: 12px;
   padding: 10px 12px;
@@ -462,12 +466,14 @@ select:focus {
 .totais-concentracao-item strong {
   font-size: 18px;
   text-align: right;
+  white-space: nowrap;
 }
 
 .totais-concentracao-item small {
   color: var(--muted);
   font-weight: 600;
   text-align: right;
+  white-space: nowrap;
 }
 
 .totais-concentracao-bar {
@@ -551,5 +557,9 @@ select:focus {
 @media (min-width: 768px) {
   .totais-grid {
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  }
+
+  .totais-card-wide {
+    grid-column: span 2;
   }
 }
