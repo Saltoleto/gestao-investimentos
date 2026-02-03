@@ -310,6 +310,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 0);
     const percentualRendaFixa = totalValor ? (totalRendaFixa / totalValor) * 100 : 0;
     const percentualRendaVariavel = totalValor ? (totalRendaVariavel / totalValor) * 100 : 0;
+    const totalLiquidezDiaria = investimentos.reduce((acc, item) => {
+      if (item.liquidez === 'Diária') return acc + (item.valor || 0);
+      return acc;
+    }, 0);
+    const totalLiquidezVencimento = investimentos.reduce((acc, item) => {
+      if (item.liquidez === 'No vencimento') return acc + (item.valor || 0);
+      return acc;
+    }, 0);
+    const percentualLiquidezDiaria = totalValor ? (totalLiquidezDiaria / totalValor) * 100 : 0;
+    const percentualLiquidezVencimento = totalValor ? (totalLiquidezVencimento / totalValor) * 100 : 0;
 
     const resumoCard = document.createElement('div');
     resumoCard.className = 'totais-card';
@@ -351,13 +361,36 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
     totaisSection.appendChild(concentracaoCard);
 
+    const concentracaoLiquidezCard = document.createElement('div');
+    concentracaoLiquidezCard.className = 'totais-card';
+    concentracaoLiquidezCard.innerHTML = `
+      <h3>Concentração por liquidez (Novo %)</h3>
+      <div class="totais-concentracao">
+        <div class="totais-concentracao-item">
+          <span>Diária</span>
+          <strong>${percentualLiquidezDiaria.toFixed(1)}%</strong>
+          <small>${formatarMoeda(totalLiquidezDiaria)}</small>
+        </div>
+        <div class="totais-concentracao-item">
+          <span>No vencimento</span>
+          <strong>${percentualLiquidezVencimento.toFixed(1)}%</strong>
+          <small>${formatarMoeda(totalLiquidezVencimento)}</small>
+        </div>
+        <div class="totais-concentracao-bar" role="img" aria-label="Concentração por liquidez: ${percentualLiquidezDiaria.toFixed(1)}% diária, ${percentualLiquidezVencimento.toFixed(1)}% no vencimento">
+          <div class="totais-concentracao-fill fixa" style="width: ${percentualLiquidezDiaria}%;"></div>
+          <div class="totais-concentracao-fill variavel" style="width: ${percentualLiquidezVencimento}%;"></div>
+        </div>
+      </div>
+    `;
+    totaisSection.appendChild(concentracaoLiquidezCard);
+
     const gruposBanco = ordenarGrupos(agruparInvestimentos(investimentos, 'banco'));
     const gruposTipo = ordenarGrupos(agruparInvestimentos(investimentos, 'tipo_produto'));
     const gruposLiquidez = ordenarGrupos(agruparInvestimentos(investimentos, 'liquidez'));
 
-    totaisSection.appendChild(criarTabelaTotais('Por banco/corretora', gruposBanco, 'Sem dados para bancos/corretoras.'));
     totaisSection.appendChild(criarTabelaTotais('Por tipo de produto', gruposTipo, 'Sem dados para tipos de produto.'));
     totaisSection.appendChild(criarTabelaTotais('Por liquidez', gruposLiquidez, 'Sem dados para liquidez.'));
+    totaisSection.appendChild(criarTabelaTotais('Por banco/corretora', gruposBanco, 'Sem dados para bancos/corretoras.'));
   }
 
   // LISTAR INVESTIMENTOS
