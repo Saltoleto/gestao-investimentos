@@ -40,6 +40,34 @@
           <button id="btn-logout" class="btn btn-logout">Sair</button>
         </div>
       </header>
+      <div class="card filter-card">
+        <div class="filter-header">
+          <h3>Filtros</h3>
+          <button id="btn-limpar-filtros" class="btn btn-ghost">Limpar</button>
+        </div>
+        <div class="filter-grid">
+          <div class="form-group">
+            <label for="filtro-banco">Banco/Corretora</label>
+            <select id="filtro-banco">
+              <option value="">Todos</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="filtro-tipo">Tipo de Produto</label>
+            <select id="filtro-tipo">
+              <option value="">Todos</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="filtro-liquidez">Liquidez</label>
+            <select id="filtro-liquidez">
+              <option value="">Todas</option>
+              <option value="Diária">Diária</option>
+              <option value="No vencimento">No vencimento</option>
+            </select>
+          </div>
+        </div>
+      </div>
       <div id="lista" class="card"></div>
     </section>
 
