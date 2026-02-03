@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
     data.forEach(i => {
       const div = document.createElement('div'); div.className = 'investimento-card';
       div.innerHTML = `
-        <strong>${i.banco}</strong><br/>
+        Banco/Corretora: ${i.banco}<br/>
         Produto: ${i.tipo_produto}<br/>
         Descrição: ${i.descricao_produto || '-'}<br/>
         Liquidez: ${i.liquidez}<br/>
