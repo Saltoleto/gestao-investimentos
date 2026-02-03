@@ -339,7 +339,7 @@ document.addEventListener('DOMContentLoaded', () => {
     totaisSection.appendChild(resumoCard);
 
     const concentracaoCard = document.createElement('div');
-    concentracaoCard.className = 'totais-card';
+    concentracaoCard.className = 'totais-card totais-card-wide';
     concentracaoCard.innerHTML = `
       <h3>Concentração por classe</h3>
       <div class="totais-concentracao">
@@ -362,7 +362,7 @@ document.addEventListener('DOMContentLoaded', () => {
     totaisSection.appendChild(concentracaoCard);
 
     const concentracaoLiquidezCard = document.createElement('div');
-    concentracaoLiquidezCard.className = 'totais-card';
+    concentracaoLiquidezCard.className = 'totais-card totais-card-wide';
     concentracaoLiquidezCard.innerHTML = `
       <h3>Concentração por liquidez</h3>
       <div class="totais-concentracao">
