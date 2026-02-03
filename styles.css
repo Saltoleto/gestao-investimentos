@@ -80,8 +80,8 @@ body {
 
 .auth-card {
   width: 100%;
-  max-width: 420px;
-  margin: 16px auto 24px;
+  max-width: 100%;
+  margin: 0;
 }
 
 .filter-card {
