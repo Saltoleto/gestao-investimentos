@@ -45,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const formatarDataBR = d => d ? d.split('T')[0].split('-').reverse().join('/') : '';
   const formatarMoeda = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const mensagemOffline = 'Você está sem conexão. Não foi possível salvar o aporte.';
 
   valorInput.addEventListener('input', () => {
     let v = valorInput.value.replace(/\D/g, '');
@@ -417,6 +418,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // SALVAR / ATUALIZAR
   form.addEventListener('submit', async e => {
     e.preventDefault(); formError.innerText = ''; formSuccess.innerText = '';
+    if (!navigator.onLine) { formError.innerText = mensagemOffline; return; }
     const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) { formError.innerText = 'Sessão inválida'; return; }
     const valor = parseFloat(valorInput.value.replace(/\./g, '').replace(',', '.'));
@@ -431,7 +433,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (investimentoEditandoId) ({ error } = await supabase.from('investimentos').update(payload).eq('id', investimentoEditandoId));
     else { payload.usuario_id = userData.user.id; ({ error } = await supabase.from('investimentos').insert(payload)); }
 
-    if (error) formError.innerText = error.message;
+    if (error) {
+      formError.innerText = navigator.onLine ? error.message : mensagemOffline;
+    }
     else {
       investimentoEditandoId = null; form.reset(); bancoSearch.value = ''; tipoInput.value = ''; descricaoInput.value = '';
       btnSubmit.innerText = 'Salvar'; document.getElementById('form-title').innerText = 'Novo';
