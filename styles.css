@@ -253,6 +253,58 @@ select:focus {
   margin-top: 4px;
 }
 
+.sync-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  background: #f8f9ff;
+}
+
+.sync-status::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border);
+}
+
+.sync-status.online {
+  color: #1a5632;
+  background: #e6f6ed;
+  border-color: #b7e1c6;
+}
+
+.sync-status.online::before {
+  background: #38a169;
+}
+
+.sync-status.offline {
+  color: #7c2d12;
+  background: #fff4e6;
+  border-color: #ffd6a5;
+}
+
+.sync-status.offline::before {
+  background: #f97316;
+}
+
+.sync-status.syncing {
+  color: #1e3a8a;
+  background: #e0e7ff;
+  border-color: #c7d2fe;
+}
+
+.sync-status.syncing::before {
+  background: #4c6fff;
+}
+
 .header-buttons {
   display: flex;
   gap: 12px;
