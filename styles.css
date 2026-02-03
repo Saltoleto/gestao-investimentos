@@ -260,6 +260,27 @@ select:focus {
   flex-wrap: wrap;
 }
 
+@media (max-width: 640px) {
+  .app-header {
+    align-items: stretch;
+  }
+
+  .header-title {
+    width: 100%;
+  }
+
+  .header-buttons {
+    width: 100%;
+    margin-top: 0;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+  }
+
+  .header-buttons .btn {
+    flex: 1;
+  }
+}
+
 .investimento-card {
   padding: 16px 0;
   border-bottom: 1px solid var(--border);
