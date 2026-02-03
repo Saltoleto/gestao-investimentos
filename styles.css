@@ -415,10 +415,10 @@ select:focus {
 }
 
 .totais-concentracao-item {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 72px 120px;
+  align-items: center;
+  column-gap: 12px;
   padding: 10px 12px;
   border-radius: 12px;
   background: #f8f9ff;
@@ -426,19 +426,48 @@ select:focus {
 }
 
 .totais-concentracao-item span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 12px;
   color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
+.totais-concentracao-item span::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--border);
+}
+
+.totais-concentracao-item.fixa span::before {
+  background: var(--primary);
+}
+
+.totais-concentracao-item.variavel span::before {
+  background: #38a169;
+}
+
+.totais-concentracao-item.diaria span::before {
+  background: #0ea5e9;
+}
+
+.totais-concentracao-item.vencimento span::before {
+  background: #f59e0b;
+}
+
 .totais-concentracao-item strong {
   font-size: 18px;
+  text-align: right;
 }
 
 .totais-concentracao-item small {
   color: var(--muted);
   font-weight: 600;
+  text-align: right;
 }
 
 .totais-concentracao-bar {
@@ -459,6 +488,14 @@ select:focus {
 
 .totais-concentracao-fill.variavel {
   background: #38a169;
+}
+
+.totais-concentracao-fill.diaria {
+  background: #0ea5e9;
+}
+
+.totais-concentracao-fill.vencimento {
+  background: #f59e0b;
 }
 
 .totais-kpi {
