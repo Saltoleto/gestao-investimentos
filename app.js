@@ -439,10 +439,4 @@ document.addEventListener('DOMContentLoaded', () => {
     const { data: sessionData } = await supabase.auth.getSession();
     if (sessionData.session) { authDiv.classList.add('hidden'); listaSection.classList.remove('hidden'); carregarInvestimentos(); }
   })();
-
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./service-worker.js');
-    });
-  }
 });
