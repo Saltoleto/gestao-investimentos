@@ -327,8 +327,7 @@ select:focus {
 }
 
 .btn-logout.btn-fab {
-  padding: 0;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .btn-logout:hover {
@@ -360,27 +359,27 @@ select:focus {
 }
 
 .fab-stack {
-  position: fixed;
-  right: 24px;
-  bottom: 24px;
-  display: flex;
-  flex-direction: column;
+  display: inline-flex;
+  align-items: center;
   gap: 12px;
-  align-items: flex-end;
-  z-index: 30;
 }
 
 .btn-fab {
-  width: 56px;
-  height: 56px;
-  padding: 0;
-  border-radius: 50%;
-  display: flex;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 28px;
+  gap: 8px;
+  font-size: 16px;
   line-height: 1;
   z-index: 1;
+}
+
+.btn-fab-icon {
+  font-size: 22px;
+  line-height: 1;
 }
 
 .form-buttons {
@@ -425,8 +424,29 @@ select:focus {
   }
 
   .fab-stack {
+    position: fixed;
     right: 16px;
     bottom: 16px;
+    flex-direction: column;
+    align-items: flex-end;
+    z-index: 30;
+  }
+
+  .btn-fab {
+    width: 56px;
+    height: 56px;
+    padding: 0;
+    border-radius: 50%;
+    font-size: 28px;
+  }
+
+  .btn-fab-label {
+    display: none;
+  }
+
+  .btn-logout.btn-fab {
+    padding: 0;
+    font-size: 18px;
   }
 }
 
