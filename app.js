@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('form');
   const btnSubmit = form.querySelector('button[type="submit"]');
   const btnLogin = document.getElementById('btn-login');
-  const btnLogout = document.getElementById('btn-logout');
   const btnNovo = document.getElementById('btn-novo');
   const btnCancelar = document.getElementById('btn-cancelar');
   const filtroBanco = document.getElementById('filtro-banco');
@@ -262,12 +261,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  btnLogout.addEventListener('click', async () => {
-    await supabase.auth.signOut();
-    authDiv.classList.remove('hidden'); listaSection.classList.add('hidden'); formSection.classList.add('hidden');
-    showToast('Sessão encerrada', 'Você saiu da aplicação com segurança.', 'info');
-  });
-
   // NOVO
   btnNovo.addEventListener('click', () => {
     investimentoEditandoId = null; form.reset(); bancoSearch.value = ''; tipoInput.value = ''; descricaoInput.value = '';
@@ -476,23 +469,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     totaisSection.appendChild(patrimonioCard);
 
-    const resumoCard = document.createElement('div');
-    resumoCard.className = 'totais-card totais-card-wide';
-    resumoCard.innerHTML = `
-      <h3>Resumo geral</h3>
-      <div class="totais-resumo">
-        <div class="totais-kpi">
-          <span>Total investido</span>
-          <strong>${formatarMoedaComPrivacidade(totalValor)}</strong>
-        </div>
-        <div class="totais-kpi">
-          <span>Quantidade de investimentos</span>
-          <strong>${totalQuantidade}</strong>
-        </div>
-      </div>
-    `;
-    totaisSection.appendChild(resumoCard);
-
     const concentracaoCard = document.createElement('div');
     concentracaoCard.className = 'totais-card totais-card-wide';
     concentracaoCard.innerHTML = `
@@ -526,7 +502,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const concentracaoLiquidezCard = document.createElement('div');
     concentracaoLiquidezCard.className = 'totais-card totais-card-wide';
     concentracaoLiquidezCard.innerHTML = `
-      <h3>Concentração por liquidez</h3>
+      <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock text-slate-500" aria-hidden="true" focusable="false">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        Liquidez
+      </h3>
       <div class="totais-concentracao">
         <div class="totais-concentracao-item diaria">
           <span>Diária</span>
