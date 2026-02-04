@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "Gestao Investimentos",
+    "slug": "gestao-investimentos",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0f172a"
+      }
+    },
+    "web": {},
+    "extra": {
+      "supabaseUrl": "${EXPO_PUBLIC_SUPABASE_URL}",
+      "supabaseAnonKey": "${EXPO_PUBLIC_SUPABASE_ANON_KEY}"
+    }
+  }
+}
