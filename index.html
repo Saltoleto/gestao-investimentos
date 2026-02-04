@@ -55,28 +55,33 @@
       <div class="card filter-card">
         <div class="filter-header">
           <h3>Filtros</h3>
-          <button id="btn-limpar-filtros" class="btn btn-ghost">Limpar</button>
+          <div class="filter-actions">
+            <button id="btn-toggle-filtros" class="btn btn-ghost" type="button" aria-expanded="false">Mostrar filtros</button>
+            <button id="btn-limpar-filtros" class="btn btn-ghost" type="button">Limpar</button>
+          </div>
         </div>
-        <div class="filter-grid">
-          <div class="form-group">
-            <label for="filtro-banco">Banco/Corretora</label>
-            <select id="filtro-banco">
-              <option value="">Todos</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="filtro-tipo">Tipo de Produto</label>
-            <select id="filtro-tipo">
-              <option value="">Todos</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="filtro-liquidez">Liquidez</label>
-            <select id="filtro-liquidez">
-              <option value="">Todas</option>
-              <option value="Diária">Diária</option>
-              <option value="No vencimento">No vencimento</option>
-            </select>
+        <div class="filter-body">
+          <div class="filter-grid">
+            <div class="form-group">
+              <label for="filtro-banco">Banco/Corretora</label>
+              <select id="filtro-banco">
+                <option value="">Todos</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="filtro-tipo">Tipo de Produto</label>
+              <select id="filtro-tipo">
+                <option value="">Todos</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="filtro-liquidez">Liquidez</label>
+              <select id="filtro-liquidez">
+                <option value="">Todas</option>
+                <option value="Diária">Diária</option>
+                <option value="No vencimento">No vencimento</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
