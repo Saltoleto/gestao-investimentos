@@ -198,6 +198,10 @@ body {
   gap: 8px;
 }
 
+.gap-1 {
+  gap: 4px;
+}
+
 .form-group {
   margin-bottom: 12px;
   position: relative;
