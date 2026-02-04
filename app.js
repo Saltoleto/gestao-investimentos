@@ -9,6 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('form');
   const btnSubmit = form.querySelector('button[type="submit"]');
   const btnLogin = document.getElementById('btn-login');
+  const btnAuthSwitch = document.getElementById('btn-auth-switch');
+  const btnAuthRecover = document.getElementById('btn-auth-recover');
   const btnNovo = document.getElementById('btn-novo');
   const btnCancelar = document.getElementById('btn-cancelar');
   const filtroBanco = document.getElementById('filtro-banco');
@@ -26,6 +28,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const emailInput = document.getElementById('email');
   const passwordInput = document.getElementById('password');
+  const passwordConfirmInput = document.getElementById('password-confirm');
+  const emailGroup = document.getElementById('email-group');
+  const passwordGroup = document.getElementById('password-group');
+  const passwordConfirmGroup = document.getElementById('password-confirm-group');
+  const authTitle = document.getElementById('auth-title');
+  const authHelper = document.getElementById('auth-helper');
   const valorInput = document.getElementById('valor');
   const bancoSearch = document.getElementById('banco-search');
   const bancoList = document.getElementById('banco-list');
@@ -60,6 +68,70 @@ document.addEventListener('DOMContentLoaded', () => {
   const formatarDataBR = d => d ? d.split('T')[0].split('-').reverse().join('/') : '';
   const formatarMoeda = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   const formatarMoedaComPrivacidade = v => (mostrarValores ? formatarMoeda(v) : 'R$ ••••••');
+
+  const authState = {
+    mode: 'login'
+  };
+
+  const resetAuthMensagens = () => {
+    authError.innerText = '';
+    formError.innerText = '';
+  };
+
+  const setAuthMode = mode => {
+    authState.mode = mode;
+    resetAuthMensagens();
+    if (mode === 'login') {
+      authTitle.innerText = 'Entrar';
+      authHelper.innerText = 'Gerencie seus investimentos com uma visão clara e segura.';
+      emailGroup.classList.remove('hidden');
+      passwordGroup.classList.remove('hidden');
+      passwordConfirmGroup.classList.add('hidden');
+      btnLogin.innerText = 'Entrar';
+      btnAuthSwitch.innerText = 'Criar conta';
+      btnAuthSwitch.classList.remove('hidden');
+      btnAuthRecover.classList.remove('hidden');
+    } else if (mode === 'signup') {
+      authTitle.innerText = 'Criar conta';
+      authHelper.innerText = 'Crie seu acesso para acompanhar seus investimentos com segurança.';
+      emailGroup.classList.remove('hidden');
+      passwordGroup.classList.remove('hidden');
+      passwordConfirmGroup.classList.remove('hidden');
+      btnLogin.innerText = 'Criar conta';
+      btnAuthSwitch.innerText = 'Já tenho conta';
+      btnAuthSwitch.classList.remove('hidden');
+      btnAuthRecover.classList.add('hidden');
+    } else if (mode === 'recover') {
+      authTitle.innerText = 'Recuperar senha';
+      authHelper.innerText = 'Envie um link de recuperação para redefinir sua senha.';
+      emailGroup.classList.remove('hidden');
+      passwordGroup.classList.add('hidden');
+      passwordConfirmGroup.classList.add('hidden');
+      btnLogin.innerText = 'Enviar link';
+      btnAuthSwitch.innerText = 'Voltar ao login';
+      btnAuthSwitch.classList.remove('hidden');
+      btnAuthRecover.classList.add('hidden');
+    } else if (mode === 'reset') {
+      authTitle.innerText = 'Definir nova senha';
+      authHelper.innerText = 'Crie uma nova senha para continuar usando o painel.';
+      emailGroup.classList.add('hidden');
+      passwordGroup.classList.remove('hidden');
+      passwordConfirmGroup.classList.remove('hidden');
+      btnLogin.innerText = 'Atualizar senha';
+      btnAuthSwitch.innerText = 'Voltar ao login';
+      btnAuthSwitch.classList.remove('hidden');
+      btnAuthRecover.classList.add('hidden');
+    }
+    passwordInput.value = '';
+    if (passwordConfirmInput) passwordConfirmInput.value = '';
+  };
+
+  const handleAuthenticated = () => {
+    authDiv.classList.add('hidden');
+    listaSection.classList.remove('hidden');
+    formSection.classList.add('hidden');
+    carregarInvestimentos();
+  };
 
   const isIos = () => /iphone|ipad|ipod/i.test(navigator.userAgent);
   const isInStandaloneMode = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
@@ -264,29 +336,112 @@ document.addEventListener('DOMContentLoaded', () => {
   liquidezRadios.forEach(r => r.addEventListener('change', atualizarVencimento));
   atualizarVencimento();
 
-  // LOGIN
+  // AUTH
   btnLogin.addEventListener('click', async () => {
     formError.innerText = '';
     authError.innerText = '';
-    if (!emailInput.value || !passwordInput.value) {
-      authError.innerText = 'Informe email e senha para continuar.';
-      showToast('Dados incompletos', 'Preencha email e senha para acessar.', 'error');
+    if (authState.mode === 'login') {
+      if (!emailInput.value || !passwordInput.value) {
+        authError.innerText = 'Informe email e senha para continuar.';
+        showToast('Dados incompletos', 'Preencha email e senha para acessar.', 'error');
+        return;
+      }
+      const { error } = await supabase.auth.signInWithPassword({ email: emailInput.value, password: passwordInput.value });
+      if (error) {
+        authError.innerText = error.message;
+        showToast('Não foi possível entrar', error.message, 'error');
+        return;
+      }
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (sessionData.session) {
+        handleAuthenticated();
+        showToast('Bem-vindo!', 'Login realizado com sucesso.', 'success');
+      } else {
+        authError.innerText = 'Falha ao autenticar';
+        showToast('Falha ao autenticar', 'Tente novamente em instantes.', 'error');
+      }
       return;
     }
-    const { data, error } = await supabase.auth.signInWithPassword({ email: emailInput.value, password: passwordInput.value });
-    if (error) {
-      authError.innerText = error.message;
-      showToast('Não foi possível entrar', error.message, 'error');
+
+    if (authState.mode === 'signup') {
+      if (!emailInput.value || !passwordInput.value || !passwordConfirmInput.value) {
+        authError.innerText = 'Preencha email e senha para continuar.';
+        showToast('Dados incompletos', 'Complete os campos para criar sua conta.', 'error');
+        return;
+      }
+      if (passwordInput.value !== passwordConfirmInput.value) {
+        authError.innerText = 'As senhas não conferem.';
+        showToast('Senhas diferentes', 'Verifique as senhas digitadas.', 'error');
+        return;
+      }
+      const { error } = await supabase.auth.signUp({
+        email: emailInput.value,
+        password: passwordInput.value,
+        options: {
+          emailRedirectTo: window.location.origin + window.location.pathname
+        }
+      });
+      if (error) {
+        authError.innerText = error.message;
+        showToast('Não foi possível cadastrar', error.message, 'error');
+        return;
+      }
+      showToast('Conta criada', 'Verifique seu e-mail para confirmar o cadastro.', 'success');
+      setAuthMode('login');
       return;
     }
-    const { data: sessionData } = await supabase.auth.getSession();
-    if (sessionData.session) {
-      authDiv.classList.add('hidden'); listaSection.classList.remove('hidden'); formSection.classList.add('hidden'); carregarInvestimentos();
-      showToast('Bem-vindo!', 'Login realizado com sucesso.', 'success');
+
+    if (authState.mode === 'recover') {
+      if (!emailInput.value) {
+        authError.innerText = 'Informe o email da conta.';
+        showToast('Email necessário', 'Digite o email para recuperar a senha.', 'error');
+        return;
+      }
+      const { error } = await supabase.auth.resetPasswordForEmail(emailInput.value, {
+        redirectTo: window.location.origin + window.location.pathname
+      });
+      if (error) {
+        authError.innerText = error.message;
+        showToast('Erro ao enviar email', error.message, 'error');
+        return;
+      }
+      showToast('Email enviado', 'Confira sua caixa de entrada para redefinir a senha.', 'success');
+      setAuthMode('login');
+      return;
+    }
+
+    if (authState.mode === 'reset') {
+      if (!passwordInput.value || !passwordConfirmInput.value) {
+        authError.innerText = 'Informe e confirme a nova senha.';
+        showToast('Senha necessária', 'Preencha os campos para continuar.', 'error');
+        return;
+      }
+      if (passwordInput.value !== passwordConfirmInput.value) {
+        authError.innerText = 'As senhas não conferem.';
+        showToast('Senhas diferentes', 'Verifique as senhas digitadas.', 'error');
+        return;
+      }
+      const { error } = await supabase.auth.updateUser({ password: passwordInput.value });
+      if (error) {
+        authError.innerText = error.message;
+        showToast('Erro ao atualizar senha', error.message, 'error');
+        return;
+      }
+      showToast('Senha atualizada', 'Você já pode acessar sua conta.', 'success');
+      handleAuthenticated();
+    }
+  });
+
+  btnAuthSwitch.addEventListener('click', () => {
+    if (authState.mode === 'login') {
+      setAuthMode('signup');
     } else {
-      authError.innerText = 'Falha ao autenticar';
-      showToast('Falha ao autenticar', 'Tente novamente em instantes.', 'error');
+      setAuthMode('login');
     }
+  });
+
+  btnAuthRecover.addEventListener('click', () => {
+    setAuthMode('recover');
   });
 
   // NOVO
@@ -657,10 +812,35 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  const recoveryInUrl = window.location.hash.includes('type=recovery');
+  setAuthMode(recoveryInUrl ? 'reset' : 'login');
+
+  supabase.auth.onAuthStateChange((event) => {
+    if (event === 'PASSWORD_RECOVERY') {
+      authDiv.classList.remove('hidden');
+      listaSection.classList.add('hidden');
+      formSection.classList.add('hidden');
+      setAuthMode('reset');
+      return;
+    }
+    if (event === 'SIGNED_OUT') {
+      authDiv.classList.remove('hidden');
+      listaSection.classList.add('hidden');
+      formSection.classList.add('hidden');
+      setAuthMode('login');
+      return;
+    }
+    if (event === 'SIGNED_IN' && authState.mode !== 'reset') {
+      handleAuthenticated();
+    }
+  });
+
   // AUTO LOAD
   (async () => {
     const { data: sessionData } = await supabase.auth.getSession();
-    if (sessionData.session) { authDiv.classList.add('hidden'); listaSection.classList.remove('hidden'); carregarInvestimentos(); }
+    if (sessionData.session && authState.mode !== 'reset') {
+      handleAuthenticated();
+    }
   })();
 
   if ('serviceWorker' in navigator) {
