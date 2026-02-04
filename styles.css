@@ -410,13 +410,6 @@ select:focus {
   margin-top: 4px;
 }
 
-.header-buttons {
-  display: flex;
-  gap: 12px;
-  margin-top: 8px;
-  flex-wrap: wrap;
-}
-
 @media (max-width: 640px) {
   .app-header {
     align-items: stretch;
@@ -431,17 +424,6 @@ select:focus {
     width: 100%;
   }
 
-  .header-buttons {
-    width: 100%;
-    margin-top: 0;
-    justify-content: space-between;
-    flex-wrap: nowrap;
-  }
-
-  .header-buttons .btn {
-    flex: 1;
-  }
-
   .fab-stack {
     right: 16px;
     bottom: 16px;
@@ -450,6 +432,29 @@ select:focus {
 
 .investimento-list {
   display: grid;
+  gap: 16px;
+}
+
+#lista {
+  gap: 16px;
+}
+
+.investimento-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.investimento-list-header h3 {
+  margin: 0;
+}
+
+.investimento-resumo {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 600;
 }
 
 #lista-conteudo {
@@ -467,6 +472,16 @@ select:focus {
   display: grid;
   gap: 12px;
   position: relative;
+}
+
+.investimento-main {
+  display: grid;
+  gap: 16px;
+}
+
+.investimento-info {
+  display: grid;
+  gap: 12px;
 }
 
 .investimento-header {
@@ -529,14 +544,15 @@ select:focus {
 }
 
 .investimento-acoes {
-  margin-top: 8px;
   display: flex;
   gap: 8px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
 }
 
 .investimento-acoes button {
-  flex: 1;
-  padding: 10px;
+  flex: 1 1 120px;
+  padding: 10px 12px;
   font-size: 14px;
   font-weight: bold;
   transition: background 0.2s;
@@ -583,20 +599,8 @@ select:focus {
   margin-top: 12px;
 }
 
-.radio-group {
-  display: flex;
-  gap: 16px;
-  margin-top: 4px;
-}
-
 .hidden {
   display: none;
-}
-
-@media (min-width: 768px) {
-  .header-buttons {
-    margin-top: 0;
-  }
 }
 
 .radio-inline {
@@ -907,6 +911,20 @@ select:focus {
 }
 
 @media (min-width: 768px) {
+  .investimento-main {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+
+  .investimento-acoes {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .investimento-acoes button {
+    min-width: 140px;
+  }
+
   .totais-grid {
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   }

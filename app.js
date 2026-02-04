@@ -4,8 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const authDiv = document.getElementById('auth');
   const listaSection = document.getElementById('lista-section');
   const formSection = document.getElementById('form-section');
-  const lista = document.getElementById('lista');
   const listaConteudo = document.getElementById('lista-conteudo');
+  const listaResumo = document.getElementById('lista-resumo');
   const form = document.getElementById('form');
   const btnSubmit = form.querySelector('button[type="submit"]');
   const btnLogin = document.getElementById('btn-login');
@@ -67,8 +67,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 4200);
   };
 
+  const removerMensagemDuplicada = (titulo, mensagem) => {
+    if (!titulo || !mensagem) return mensagem;
+    const tituloNormalizado = titulo.trim().toLowerCase();
+    const mensagemNormalizada = mensagem.trim().toLowerCase();
+    if (!mensagemNormalizada.startsWith(tituloNormalizado)) return mensagem;
+    const restante = mensagem.trim().slice(titulo.trim().length).trim().replace(/^[:.-]\s*/, '');
+    return restante || mensagem;
+  };
+
   const setFeedback = (target, title, message, type = 'error', showToastMessage = true) => {
-    const formattedMessage = formatarMensagemFeedback(message);
+    const formattedMessage = formatarMensagemFeedback(removerMensagemDuplicada(title, message));
     if (target) {
       target.innerText = formattedMessage;
     }
@@ -603,13 +612,30 @@ document.addEventListener('DOMContentLoaded', () => {
   // LISTAR INVESTIMENTOS
   function renderizarInvestimentos(investimentos) {
     listaConteudo.innerHTML = '';
+    if (listaResumo) {
+      const total = investimentosCache.length;
+      const atual = investimentos.length;
+      if (total && total !== atual) {
+        listaResumo.textContent = `${atual} de ${total} investimentos`;
+      } else if (total) {
+        listaResumo.textContent = `${total} investimento${total > 1 ? 's' : ''}`;
+      } else {
+        listaResumo.textContent = '';
+      }
+    }
     if (!investimentos.length) {
-      const mensagem = investimentosCache.length ? 'Nenhum investimento encontrado com os filtros atuais' : 'Nenhum investimento cadastrado';
+      const mensagem = investimentosCache.length
+        ? 'Nenhum investimento encontrado com os filtros atuais'
+        : 'Nenhum investimento cadastrado';
       listaConteudo.innerHTML = `
         <div class="empty-state">
           <span aria-hidden="true">📭</span>
           <p>${mensagem}</p>
-          <small>Experimente ajustar os filtros ou cadastre um novo aporte.</small>
+          <small>${
+            investimentosCache.length
+              ? 'Experimente ajustar os filtros ou cadastrar um novo aporte.'
+              : 'Comece cadastrando um novo aporte para acompanhar seus investimentos.'
+          }</small>
         </div>
       `;
       return;
@@ -617,31 +643,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
     investimentos.forEach(i => {
       const div = document.createElement('div'); div.className = 'investimento-card';
+      const descricaoProduto = i.descricao_produto?.trim();
+      const dataAporte = i.data_aporte ? formatarDataBR(i.data_aporte) : '-';
+      const dataVencimento = i.data_vencimento ? formatarDataBR(i.data_vencimento) : '-';
       div.innerHTML = `
-        <div class="investimento-header">
-          <div>
-            <span class="investimento-title">${i.banco}</span>
-            <span class="investimento-subtitle">${i.tipo_produto}</span>
+        <div class="investimento-main">
+          <div class="investimento-info">
+            <div class="investimento-header">
+              <div>
+                <span class="investimento-title">${i.banco}</span>
+                <span class="investimento-subtitle">${i.tipo_produto}</span>
+              </div>
+              <div class="investimento-value">${formatarMoedaComPrivacidade(i.valor)}</div>
+            </div>
+            <div class="investimento-tags">
+              <span class="badge">${i.liquidez}</span>
+              ${descricaoProduto ? `<span class="badge neutral">${descricaoProduto}</span>` : ''}
+            </div>
+            <div class="investimento-meta">
+              <div>
+                <span class="label">Data de Aporte</span>
+                <span class="value">${dataAporte}</span>
+              </div>
+              <div>
+                <span class="label">Vencimento</span>
+                <span class="value">${dataVencimento}</span>
+              </div>
+            </div>
           </div>
-          <div class="investimento-value">${formatarMoeda(i.valor)}</div>
-        </div>
-        <div class="investimento-tags">
-          <span class="badge">${i.liquidez}</span>
-          <span class="badge neutral">${i.descricao_produto || 'Sem descrição'}</span>
-        </div>
-        <div class="investimento-meta">
-          <div>
-            <span class="label">Data de Aporte</span>
-            <span class="value">${formatarDataBR(i.data_aporte)}</span>
+          <div class="investimento-acoes">
+            <button class="btn btn-editar" type="button">Editar</button>
+            <button class="btn btn-excluir" type="button">Excluir</button>
           </div>
-          <div>
-            <span class="label">Vencimento</span>
-            <span class="value">${i.data_vencimento ? formatarDataBR(i.data_vencimento) : '-'}</span>
-          </div>
-        </div>
-        <div class="investimento-acoes">
-          <button class="btn btn-editar">Editar</button>
-          <button class="btn btn-excluir">Excluir</button>
         </div>
       `;
       div.querySelector('.btn-editar').addEventListener('click', () => {
@@ -794,6 +827,7 @@ document.addEventListener('DOMContentLoaded', () => {
     toggleButton.addEventListener('click', () => {
       mostrarValores = !mostrarValores;
       renderizarTotais(investimentosFiltradosCache);
+      renderizarInvestimentos(investimentosFiltradosCache);
     });
     totaisSection.appendChild(patrimonioCard);
 
