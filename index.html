@@ -36,17 +36,25 @@
 
     <!-- LOGIN -->
     <section id="auth" class="card auth-card">
-      <h2 class="section-title">Entrar</h2>
-      <p class="section-helper">Gerencie seus investimentos com uma visão clara e segura.</p>
-      <div class="form-group">
+      <h2 id="auth-title" class="section-title">Entrar</h2>
+      <p id="auth-helper" class="section-helper">Gerencie seus investimentos com uma visão clara e segura.</p>
+      <div class="form-group" id="email-group">
         <label for="email">Email</label>
         <input id="email" type="email" placeholder="voce@exemplo.com" />
       </div>
-      <div class="form-group">
+      <div class="form-group" id="password-group">
         <label for="password">Senha</label>
         <input id="password" type="password" placeholder="Digite sua senha" />
       </div>
-      <button id="btn-login" class="btn btn-primary">Entrar</button>
+      <div class="form-group hidden" id="password-confirm-group">
+        <label for="password-confirm">Confirmar senha</label>
+        <input id="password-confirm" type="password" placeholder="Repita sua senha" />
+      </div>
+      <button id="btn-login" class="btn btn-primary" type="button">Entrar</button>
+      <div class="auth-actions">
+        <button id="btn-auth-switch" class="btn btn-ghost" type="button">Criar conta</button>
+        <button id="btn-auth-recover" class="btn btn-ghost" type="button">Esqueci minha senha</button>
+      </div>
       <p id="auth-error" class="error" role="alert"></p>
     </section>
 
