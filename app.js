@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnAuthRecover = document.getElementById('btn-auth-recover');
   const btnNovo = document.getElementById('btn-novo');
   const btnCancelar = document.getElementById('btn-cancelar');
+  const btnLogout = document.getElementById('btn-logout');
   const filtroBanco = document.getElementById('filtro-banco');
   const filtroTipo = document.getElementById('filtro-tipo');
   const filtroLiquidez = document.getElementById('filtro-liquidez');
@@ -131,6 +132,9 @@ document.addEventListener('DOMContentLoaded', () => {
     authDiv.classList.add('hidden');
     listaSection.classList.remove('hidden');
     formSection.classList.add('hidden');
+    if (btnLogout) {
+      btnLogout.classList.remove('hidden');
+    }
     carregarInvestimentos();
   };
 
@@ -481,6 +485,17 @@ document.addEventListener('DOMContentLoaded', () => {
   btnAuthRecover.addEventListener('click', () => {
     setAuthMode('recover');
   });
+
+  if (btnLogout) {
+    btnLogout.addEventListener('click', async () => {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        showToast('Erro ao sair', error.message, 'error');
+        return;
+      }
+      showToast('Sessão encerrada', 'Você saiu da sua conta.', 'success');
+    });
+  }
 
   // NOVO
   btnNovo.addEventListener('click', () => {
@@ -859,6 +874,9 @@ document.addEventListener('DOMContentLoaded', () => {
       listaSection.classList.add('hidden');
       formSection.classList.add('hidden');
       setAuthMode('reset');
+      if (btnLogout) {
+        btnLogout.classList.add('hidden');
+      }
       return;
     }
     if (event === 'SIGNED_OUT') {
@@ -866,6 +884,9 @@ document.addEventListener('DOMContentLoaded', () => {
       listaSection.classList.add('hidden');
       formSection.classList.add('hidden');
       setAuthMode('login');
+      if (btnLogout) {
+        btnLogout.classList.add('hidden');
+      }
       return;
     }
     if (event === 'SIGNED_IN' && authState.mode !== 'reset') {
