@@ -135,6 +135,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const isIos = () => /iphone|ipad|ipod/i.test(navigator.userAgent);
   const isInStandaloneMode = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  const isSecureAuthContext = () => window.isSecureContext
+    || window.location.protocol === 'https:'
+    || ['localhost', '127.0.0.1'].includes(window.location.hostname);
   const pwaInstallState = {
     deferredPrompt: null
   };
@@ -340,6 +343,11 @@ document.addEventListener('DOMContentLoaded', () => {
   btnLogin.addEventListener('click', async () => {
     formError.innerText = '';
     authError.innerText = '';
+    if (!isSecureAuthContext()) {
+      authError.innerText = 'Conexão insegura. Utilize HTTPS para proteger seus dados.';
+      showToast('Conexão insegura', 'Use HTTPS para enviar suas credenciais com segurança.', 'error');
+      return;
+    }
     if (authState.mode === 'login') {
       if (!emailInput.value || !passwordInput.value) {
         authError.innerText = 'Informe email e senha para continuar.';
