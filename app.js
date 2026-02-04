@@ -1044,7 +1044,7 @@ document.addEventListener('DOMContentLoaded', () => {
   })();
 
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./service-worker.js').catch(() => {
+    navigator.serviceWorker.register('/investimentos/service-worker.js').catch(() => {
       showToast('PWA', 'Não foi possível ativar o modo offline.', 'error');
     });
   }
