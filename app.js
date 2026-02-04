@@ -567,23 +567,22 @@ document.addEventListener('DOMContentLoaded', () => {
     setAuthMode('recover');
   });
 
+  const abrirFormularioNovoInvestimento = () => {
+    investimentoEditandoId = null; form.reset(); bancoSearch.value = ''; tipoInput.value = ''; descricaoInput.value = '';
+    btnSubmit.innerText = 'Salvar'; document.getElementById('form-title').innerText = 'Novo';
+    formSection.classList.remove('hidden'); listaSection.classList.add('hidden'); formError.innerText = ''; formSuccess.innerText = ''; valorInput.focus();
+    atualizarVencimento();
+  };
+
   if (btnLogout) {
-    btnLogout.addEventListener('click', async () => {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        showToast('Não foi possível sair', montarMensagemErro('Não foi possível sair.', error), 'error');
-        return;
-      }
-      showToast('Sessão encerrada', 'Você saiu da sua conta.', 'success');
+    btnLogout.addEventListener('click', () => {
+      abrirFormularioNovoInvestimento();
     });
   }
 
   // NOVO
   btnNovo.addEventListener('click', () => {
-    investimentoEditandoId = null; form.reset(); bancoSearch.value = ''; tipoInput.value = ''; descricaoInput.value = '';
-    btnSubmit.innerText = 'Salvar'; document.getElementById('form-title').innerText = 'Novo';
-    formSection.classList.remove('hidden'); listaSection.classList.add('hidden'); formError.innerText = ''; formSuccess.innerText = ''; valorInput.focus();
-    atualizarVencimento();
+    abrirFormularioNovoInvestimento();
   });
 
   // CANCELAR
