@@ -387,10 +387,15 @@ document.addEventListener('DOMContentLoaded', () => {
       .sort((a, b) => b.total - a.total || a.label.localeCompare(b.label));
   }
 
-  function criarTabelaTotais(titulo, grupos, emptyMessage) {
+  function criarTabelaTotais(titulo, iconeSvg, grupos, emptyMessage) {
     const card = document.createElement('div');
     card.className = 'totais-card';
-    card.innerHTML = `<h3>${titulo}</h3>`;
+    card.innerHTML = `
+      <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+        ${iconeSvg}
+        <span>${titulo}</span>
+      </h3>
+    `;
 
     if (!grupos.length) {
       const empty = document.createElement('p');
@@ -506,7 +511,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"></path>
           <path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"></path>
         </svg>
-        Alocação por Classe
+        Alocação
       </h3>
       <div class="totais-concentracao">
         <div class="totais-concentracao-item fixa">
@@ -560,9 +565,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const gruposTipo = ordenarGrupos(agruparInvestimentos(investimentos, 'tipo_produto'));
     const gruposLiquidez = ordenarGrupos(agruparInvestimentos(investimentos, 'liquidez'));
 
-    totaisSection.appendChild(criarTabelaTotais('Quantidade por tipo de produto', gruposTipo, 'Sem dados para tipos de produto.'));
-    totaisSection.appendChild(criarTabelaTotais('Quantidade por liquidez', gruposLiquidez, 'Sem dados para liquidez.'));
-    totaisSection.appendChild(criarTabelaTotais('Quantidade por banco/corretora', gruposBanco, 'Sem dados para bancos/corretoras.'));
+    const iconeTipoProduto = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-tag text-slate-500" aria-hidden="true" focusable="false">
+        <path d="M20.59 13.41 11 3.83A2 2 0 0 0 9.59 3H4a1 1 0 0 0-1 1v5.59A2 2 0 0 0 3.83 11l9.58 9.58a2 2 0 0 0 2.83 0l4.35-4.35a2 2 0 0 0 0-2.82Z"></path>
+        <line x1="7" y1="7" x2="7.01" y2="7"></line>
+      </svg>
+    `;
+    const iconeLiquidez = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-droplet text-slate-500" aria-hidden="true" focusable="false">
+        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0Z"></path>
+      </svg>
+    `;
+    const iconeInstituicao = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-landmark text-slate-500" aria-hidden="true" focusable="false">
+        <line x1="3" y1="22" x2="21" y2="22"></line>
+        <line x1="6" y1="18" x2="6" y2="11"></line>
+        <line x1="10" y1="18" x2="10" y2="11"></line>
+        <line x1="14" y1="18" x2="14" y2="11"></line>
+        <line x1="18" y1="18" x2="18" y2="11"></line>
+        <polygon points="12 2 20 7 4 7"></polygon>
+      </svg>
+    `;
+
+    totaisSection.appendChild(criarTabelaTotais('Tipos de produto', iconeTipoProduto, gruposTipo, 'Sem dados para tipos de produto.'));
+    totaisSection.appendChild(criarTabelaTotais('Prazos de liquidez', iconeLiquidez, gruposLiquidez, 'Sem dados para liquidez.'));
+    totaisSection.appendChild(criarTabelaTotais('Instituições financeiras', iconeInstituicao, gruposBanco, 'Sem dados para bancos/corretoras.'));
   }
 
   // LISTAR INVESTIMENTOS
