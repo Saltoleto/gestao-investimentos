@@ -490,8 +490,8 @@ document.addEventListener('DOMContentLoaded', () => {
           <strong>${totalQuantidade}</strong>
         </div>
         <div>
-          <span>Base aplicada</span>
-          <strong>${formatarMoedaComPrivacidade(totalValor)}</strong>
+          <span>Liquidez diária</span>
+          <strong>${formatarMoedaComPrivacidade(totalLiquidezDiaria)}</strong>
         </div>
       </div>
     `;
