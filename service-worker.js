@@ -1,13 +1,14 @@
 const CACHE_NAME = 'gestao-investimentos-v1';
+const BASE_PATH = '/investimentos/';
 const ASSETS = [
-  './',
-  './index.html',
-  './styles.css',
-  './app.js',
-  './supabase.js',
-  './manifest.json',
-  './icon-192.svg',
-  './icon-512.svg'
+  BASE_PATH,
+  `${BASE_PATH}index.html`,
+  `${BASE_PATH}styles.css`,
+  `${BASE_PATH}app.js`,
+  `${BASE_PATH}supabase.js`,
+  `${BASE_PATH}manifest.json`,
+  `${BASE_PATH}icon-192.svg`,
+  `${BASE_PATH}icon-512.svg`
 ];
 
 self.addEventListener('install', event => {
@@ -44,7 +45,7 @@ self.addEventListener('fetch', event => {
             caches.open(CACHE_NAME).then(cache => cache.put(event.request, responseClone));
             return response;
           })
-          .catch(() => cachedResponse || caches.match('./index.html'));
+          .catch(() => cachedResponse || caches.match(`${BASE_PATH}index.html`));
 
         return cachedResponse || fetchPromise;
       })
@@ -54,7 +55,7 @@ self.addEventListener('fetch', event => {
 
   if (event.request.mode === 'navigate') {
     event.respondWith(
-      fetch(event.request).catch(() => caches.match('./index.html'))
+      fetch(event.request).catch(() => caches.match(`${BASE_PATH}index.html`))
     );
   }
 });
