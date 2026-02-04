@@ -1,5 +1,5 @@
 const CACHE_NAME = 'gestao-investimentos-v1';
-const BASE_PATH = '/investimentos/';
+const BASE_PATH = '/';
 const ASSETS = [
   BASE_PATH,
   `${BASE_PATH}index.html`,
