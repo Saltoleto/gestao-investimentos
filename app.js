@@ -52,9 +52,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const tiposProdutos = ["CDB", "LCI", "LCA", "Tesouro Direto", "Fundos de Renda Fixa", "Ações", "ETFs", "Fundos Imobiliários", "Debêntures", "CRI/CRA"].sort();
   let investimentoEditandoId = null;
   let investimentosCache = [];
+  let investimentosFiltradosCache = [];
+  let mostrarValores = true;
 
   const formatarDataBR = d => d ? d.split('T')[0].split('-').reverse().join('/') : '';
   const formatarMoeda = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const formatarMoedaComPrivacidade = v => (mostrarValores ? formatarMoeda(v) : 'R$ ••••••');
 
   const isIos = () => /iphone|ipad|ipod/i.test(navigator.userAgent);
   const isInStandaloneMode = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
@@ -204,6 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return bancoOk && tipoOk && liquidezOk;
     });
 
+    investimentosFiltradosCache = filtrados;
     renderizarTotais(filtrados);
     renderizarInvestimentos(filtrados);
   }
@@ -392,7 +396,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <tr>
             <td>${grupo.label}</td>
             <td>${grupo.quantidade}</td>
-            <td>${formatarMoeda(grupo.total)}</td>
+            <td>${formatarMoedaComPrivacidade(grupo.total)}</td>
           </tr>
         `
           )
@@ -442,6 +446,36 @@ document.addEventListener('DOMContentLoaded', () => {
     const percentualLiquidezDiaria = totalValor ? (totalLiquidezDiaria / totalValor) * 100 : 0;
     const percentualLiquidezVencimento = totalValor ? (totalLiquidezVencimento / totalValor) * 100 : 0;
 
+    const patrimonioCard = document.createElement('div');
+    patrimonioCard.className = 'totais-card totais-card-hero totais-card-wide';
+    patrimonioCard.innerHTML = `
+      <div class="totais-hero-header">
+        <div>
+          <span class="totais-hero-label">Patrimônio total</span>
+          <h3 class="totais-hero-value">${formatarMoedaComPrivacidade(totalValor)}</h3>
+        </div>
+        <button class="btn btn-ghost btn-toggle-valores" type="button" aria-pressed="${mostrarValores}">
+          ${mostrarValores ? 'Ocultar valores' : 'Mostrar valores'}
+        </button>
+      </div>
+      <div class="totais-hero-footer">
+        <div>
+          <span>Total de investimentos</span>
+          <strong>${totalQuantidade}</strong>
+        </div>
+        <div>
+          <span>Base aplicada</span>
+          <strong>${formatarMoedaComPrivacidade(totalValor)}</strong>
+        </div>
+      </div>
+    `;
+    const toggleButton = patrimonioCard.querySelector('.btn-toggle-valores');
+    toggleButton.addEventListener('click', () => {
+      mostrarValores = !mostrarValores;
+      renderizarTotais(investimentosFiltradosCache);
+    });
+    totaisSection.appendChild(patrimonioCard);
+
     const resumoCard = document.createElement('div');
     resumoCard.className = 'totais-card totais-card-wide';
     resumoCard.innerHTML = `
@@ -449,7 +483,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="totais-resumo">
         <div class="totais-kpi">
           <span>Total investido</span>
-          <strong>${formatarMoeda(totalValor)}</strong>
+          <strong>${formatarMoedaComPrivacidade(totalValor)}</strong>
         </div>
         <div class="totais-kpi">
           <span>Quantidade de investimentos</span>
@@ -467,12 +501,12 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="totais-concentracao-item fixa">
           <span>Renda fixa</span>
           <strong>${percentualRendaFixa.toFixed(1)}%</strong>
-          <small>${formatarMoeda(totalRendaFixa)}</small>
+          <small>${formatarMoedaComPrivacidade(totalRendaFixa)}</small>
         </div>
         <div class="totais-concentracao-item variavel">
           <span>Renda variável</span>
           <strong>${percentualRendaVariavel.toFixed(1)}%</strong>
-          <small>${formatarMoeda(totalRendaVariavel)}</small>
+          <small>${formatarMoedaComPrivacidade(totalRendaVariavel)}</small>
         </div>
         <div class="totais-concentracao-bar" role="img" aria-label="Concentração: ${percentualRendaFixa.toFixed(1)}% renda fixa, ${percentualRendaVariavel.toFixed(1)}% renda variável">
           <div class="totais-concentracao-fill fixa" style="width: ${percentualRendaFixa}%;"></div>
@@ -490,12 +524,12 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="totais-concentracao-item diaria">
           <span>Diária</span>
           <strong>${percentualLiquidezDiaria.toFixed(1)}%</strong>
-          <small>${formatarMoeda(totalLiquidezDiaria)}</small>
+          <small>${formatarMoedaComPrivacidade(totalLiquidezDiaria)}</small>
         </div>
         <div class="totais-concentracao-item vencimento">
           <span>No vencimento</span>
           <strong>${percentualLiquidezVencimento.toFixed(1)}%</strong>
-          <small>${formatarMoeda(totalLiquidezVencimento)}</small>
+          <small>${formatarMoedaComPrivacidade(totalLiquidezVencimento)}</small>
         </div>
         <div class="totais-concentracao-bar" role="img" aria-label="Concentração por liquidez: ${percentualLiquidezDiaria.toFixed(1)}% diária, ${percentualLiquidezVencimento.toFixed(1)}% no vencimento">
           <div class="totais-concentracao-fill diaria" style="width: ${percentualLiquidezDiaria}%;"></div>

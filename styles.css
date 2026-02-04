@@ -546,6 +546,84 @@ select:focus {
   min-width: 0;
 }
 
+.totais-card-hero {
+  background: linear-gradient(135deg, #1f2a44 0%, #2f3b67 50%, #4c6fff 100%);
+  color: #fff;
+  border: none;
+  box-shadow: 0 20px 45px rgba(26, 32, 44, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+.totais-card-hero::after {
+  content: '';
+  position: absolute;
+  right: -60px;
+  top: -60px;
+  width: 200px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  filter: blur(4px);
+}
+
+.totais-hero-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.totais-hero-label {
+  display: block;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: rgba(255, 255, 255, 0.75);
+  margin-bottom: 6px;
+}
+
+.totais-hero-value {
+  margin: 0;
+  font-size: clamp(26px, 3vw, 34px);
+  font-weight: 700;
+}
+
+.totais-card-hero .btn-ghost {
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.totais-card-hero .btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.totais-hero-footer {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.totais-hero-footer span {
+  display: block;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 6px;
+}
+
+.totais-hero-footer strong {
+  font-size: 18px;
+}
+
 .totais-card h3 {
   margin: 0 0 12px;
   font-size: 16px;
