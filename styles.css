@@ -382,6 +382,12 @@ select:focus {
   gap: 16px;
 }
 
+#lista-conteudo {
+  display: grid;
+  gap: 16px;
+  margin-top: 8px;
+}
+
 .investimento-card {
   padding: 18px;
   border-radius: 18px;
