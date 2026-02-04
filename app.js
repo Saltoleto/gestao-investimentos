@@ -575,8 +575,15 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   if (btnLogout) {
-    btnLogout.addEventListener('click', () => {
-      abrirFormularioNovoInvestimento();
+    btnLogout.addEventListener('click', async () => {
+      btnLogout.disabled = true;
+      const { error } = await supabase.auth.signOut();
+      btnLogout.disabled = false;
+      if (error) {
+        showToast('Não foi possível sair', montarMensagemErro('Não foi possível encerrar a sessão.', error), 'error');
+        return;
+      }
+      showToast('Sessão encerrada', 'Você saiu da aplicação com segurança.', 'success');
     });
   }
 
