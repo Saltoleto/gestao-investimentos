@@ -46,6 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const formSuccess = document.getElementById('form-success');
   const liquidezRadios = document.querySelectorAll('input[name="liquidez"]');
   const authError = document.getElementById('auth-error');
+  let authSubmitting = false;
 
   const showToast = (title, message, type = 'info') => {
     if (!toastContainer) return;
@@ -337,19 +338,31 @@ document.addEventListener('DOMContentLoaded', () => {
   atualizarVencimento();
 
   // AUTH
+  const finalizarAuthSubmit = () => {
+    authSubmitting = false;
+    btnLogin.disabled = false;
+  };
+
   btnLogin.addEventListener('click', async () => {
+    if (authSubmitting) {
+      return;
+    }
+    authSubmitting = true;
+    btnLogin.disabled = true;
     formError.innerText = '';
     authError.innerText = '';
     if (authState.mode === 'login') {
       if (!emailInput.value || !passwordInput.value) {
         authError.innerText = 'Informe email e senha para continuar.';
         showToast('Dados incompletos', 'Preencha email e senha para acessar.', 'error');
+        finalizarAuthSubmit();
         return;
       }
       const { error } = await supabase.auth.signInWithPassword({ email: emailInput.value, password: passwordInput.value });
       if (error) {
         authError.innerText = error.message;
         showToast('Não foi possível entrar', error.message, 'error');
+        finalizarAuthSubmit();
         return;
       }
       const { data: sessionData } = await supabase.auth.getSession();
@@ -360,6 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
         authError.innerText = 'Falha ao autenticar';
         showToast('Falha ao autenticar', 'Tente novamente em instantes.', 'error');
       }
+      finalizarAuthSubmit();
       return;
     }
 
@@ -367,11 +381,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!emailInput.value || !passwordInput.value || !passwordConfirmInput.value) {
         authError.innerText = 'Preencha email e senha para continuar.';
         showToast('Dados incompletos', 'Complete os campos para criar sua conta.', 'error');
+        finalizarAuthSubmit();
         return;
       }
       if (passwordInput.value !== passwordConfirmInput.value) {
         authError.innerText = 'As senhas não conferem.';
         showToast('Senhas diferentes', 'Verifique as senhas digitadas.', 'error');
+        finalizarAuthSubmit();
         return;
       }
       const { error } = await supabase.auth.signUp({
@@ -382,12 +398,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
       if (error) {
-        authError.innerText = error.message;
-        showToast('Não foi possível cadastrar', error.message, 'error');
+        if (error.status === 429) {
+          authError.innerText = 'Muitas tentativas. Aguarde alguns minutos e tente novamente.';
+          showToast('Limite atingido', 'Muitas tentativas de cadastro. Aguarde alguns minutos.', 'error');
+        } else {
+          authError.innerText = error.message;
+          showToast('Não foi possível cadastrar', error.message, 'error');
+        }
+        finalizarAuthSubmit();
         return;
       }
       showToast('Conta criada', 'Verifique seu e-mail para confirmar o cadastro.', 'success');
       setAuthMode('login');
+      finalizarAuthSubmit();
       return;
     }
 
@@ -395,6 +418,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!emailInput.value) {
         authError.innerText = 'Informe o email da conta.';
         showToast('Email necessário', 'Digite o email para recuperar a senha.', 'error');
+        finalizarAuthSubmit();
         return;
       }
       const { error } = await supabase.auth.resetPasswordForEmail(emailInput.value, {
@@ -403,10 +427,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (error) {
         authError.innerText = error.message;
         showToast('Erro ao enviar email', error.message, 'error');
+        finalizarAuthSubmit();
         return;
       }
       showToast('Email enviado', 'Confira sua caixa de entrada para redefinir a senha.', 'success');
       setAuthMode('login');
+      finalizarAuthSubmit();
       return;
     }
 
@@ -414,21 +440,25 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!passwordInput.value || !passwordConfirmInput.value) {
         authError.innerText = 'Informe e confirme a nova senha.';
         showToast('Senha necessária', 'Preencha os campos para continuar.', 'error');
+        finalizarAuthSubmit();
         return;
       }
       if (passwordInput.value !== passwordConfirmInput.value) {
         authError.innerText = 'As senhas não conferem.';
         showToast('Senhas diferentes', 'Verifique as senhas digitadas.', 'error');
+        finalizarAuthSubmit();
         return;
       }
       const { error } = await supabase.auth.updateUser({ password: passwordInput.value });
       if (error) {
         authError.innerText = error.message;
         showToast('Erro ao atualizar senha', error.message, 'error');
+        finalizarAuthSubmit();
         return;
       }
       showToast('Senha atualizada', 'Você já pode acessar sua conta.', 'success');
       handleAuthenticated();
+      finalizarAuthSubmit();
     }
   });
 
