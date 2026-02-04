@@ -567,13 +567,15 @@ select:focus {
   display: flex;
   gap: 8px;
   justify-content: flex-end;
-  align-self: stretch;
+  align-self: flex-start;
   flex-wrap: wrap;
+  align-items: center;
 }
 
 .investimento-acoes button {
-  flex: 1 1 120px;
-  padding: 10px 12px;
+  flex: 0 0 auto;
+  min-width: 120px;
+  padding: 10px 14px;
   font-size: 14px;
   font-weight: bold;
   transition: background 0.2s;
