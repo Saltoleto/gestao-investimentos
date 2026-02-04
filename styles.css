@@ -151,6 +151,34 @@ body {
   color: var(--muted);
 }
 
+.font-bold {
+  font-weight: 700;
+}
+
+.text-slate-800 {
+  color: #1e293b;
+}
+
+.text-slate-500 {
+  color: #64748b;
+}
+
+.mb-4 {
+  margin-bottom: 16px;
+}
+
+.flex {
+  display: flex;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.gap-2 {
+  gap: 8px;
+}
+
 .form-group {
   margin-bottom: 12px;
   position: relative;
@@ -627,6 +655,10 @@ select:focus {
 .totais-card h3 {
   margin: 0 0 12px;
   font-size: 16px;
+}
+
+.totais-card h3.mb-4 {
+  margin-bottom: 16px;
 }
 
 .totais-resumo {
