@@ -1,6 +1,6 @@
 {
-  "name": "Gestão Financeira Saltoleto",
-  "short_name": "Saltoleto",
+  "name": "Gestão de Investimentos",
+  "short_name": "Investimentos",
   "description": "Acompanhe aportes, liquidez e vencimentos em um só lugar.",
   "start_url": "./",
   "scope": "./",
