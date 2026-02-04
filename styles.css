@@ -450,7 +450,6 @@ select:focus {
 
 .investimento-list {
   display: grid;
-  gap: 16px;
 }
 
 #lista-conteudo {
