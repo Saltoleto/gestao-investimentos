@@ -116,6 +116,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const setAuthMode = mode => {
     authState.mode = mode;
     resetAuthMensagens();
+    if (btnNovo) {
+      btnNovo.classList.toggle('hidden', mode === 'recover' || mode === 'reset');
+    }
     if (mode === 'login') {
       authTitle.innerText = 'Entrar';
       authHelper.innerText = 'Gerencie seus investimentos com uma visão clara e segura.';
