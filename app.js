@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const listaSection = document.getElementById('lista-section');
   const formSection = document.getElementById('form-section');
   const lista = document.getElementById('lista');
+  const listaConteudo = document.getElementById('lista-conteudo');
   const form = document.getElementById('form');
   const btnSubmit = form.querySelector('button[type="submit"]');
   const btnLogin = document.getElementById('btn-login');
@@ -279,10 +280,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // LISTAR INVESTIMENTOS
   function renderizarInvestimentos(investimentos) {
-    lista.innerHTML = '';
+    listaConteudo.innerHTML = '';
     if (!investimentos.length) {
       const mensagem = investimentosCache.length ? 'Nenhum investimento encontrado com os filtros atuais' : 'Nenhum investimento cadastrado';
-      lista.innerHTML = `
+      listaConteudo.innerHTML = `
         <div class="empty-state">
           <span aria-hidden="true">📭</span>
           <p>${mensagem}</p>
@@ -339,7 +340,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showToast('Investimento excluído', 'Registro removido com sucesso.', 'success');
         carregarInvestimentos();
       });
-      lista.appendChild(div);
+      listaConteudo.appendChild(div);
     });
   }
 
@@ -539,13 +540,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // LISTAR INVESTIMENTOS
   async function carregarInvestimentos() {
-    lista.innerHTML = '';
+    listaConteudo.innerHTML = '';
     const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) return;
 
     const { data, error } = await supabase.from('investimentos').select('*').eq('usuario_id', userData.user.id).order('data_aporte', { ascending: false });
     if (error) {
-      lista.innerHTML = '<p class="error">Erro ao carregar investimentos</p>';
+      listaConteudo.innerHTML = '<p class="error">Erro ao carregar investimentos</p>';
       showToast('Erro ao carregar', 'Não foi possível obter os investimentos.', 'error');
       return;
     }
