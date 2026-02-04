@@ -33,6 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const emailGroup = document.getElementById('email-group');
   const passwordGroup = document.getElementById('password-group');
   const passwordConfirmGroup = document.getElementById('password-confirm-group');
+  const passwordStrengthFeedback = document.getElementById('password-strength');
+  const passwordMatchFeedback = document.getElementById('password-match');
   const authTitle = document.getElementById('auth-title');
   const authHelper = document.getElementById('auth-helper');
   const valorInput = document.getElementById('valor');
@@ -102,6 +104,86 @@ document.addEventListener('DOMContentLoaded', () => {
     formError.innerText = '';
   };
 
+  const limparFeedbackInline = target => {
+    if (!target) return;
+    target.textContent = '';
+    target.classList.remove('good', 'warn', 'bad');
+  };
+
+  const definirFeedbackInline = (target, status, message) => {
+    if (!target) return;
+    target.textContent = message;
+    target.classList.remove('good', 'warn', 'bad');
+    if (status) {
+      target.classList.add(status);
+    }
+  };
+
+  const avaliarForcaSenha = senha => {
+    const regras = [
+      { label: 'mínimo de 8 caracteres', test: value => value.length >= 8 },
+      { label: '12 caracteres', test: value => value.length >= 12 },
+      { label: 'letra maiúscula', test: value => /[A-Z]/.test(value) },
+      { label: 'letra minúscula', test: value => /[a-z]/.test(value) },
+      { label: 'número', test: value => /\d/.test(value) },
+      { label: 'símbolo', test: value => /[^A-Za-z0-9]/.test(value) }
+    ];
+    const resultados = regras.map(regra => ({ ...regra, ok: regra.test(senha) }));
+    const okCount = resultados.filter(regra => regra.ok).length;
+    const faltando = resultados.filter(regra => !regra.ok).map(regra => regra.label);
+    return { okCount, faltando };
+  };
+
+  const atualizarFeedbackSenha = () => {
+    if (!passwordGroup || passwordGroup.classList.contains('hidden')) {
+      limparFeedbackInline(passwordStrengthFeedback);
+      return;
+    }
+    const senha = passwordInput.value.trim();
+    if (!senha) {
+      limparFeedbackInline(passwordStrengthFeedback);
+      return;
+    }
+    const { okCount, faltando } = avaliarForcaSenha(senha);
+    if (okCount >= 5 && senha.length >= 12) {
+      definirFeedbackInline(passwordStrengthFeedback, 'good', 'Senha forte.');
+      return;
+    }
+    if (okCount >= 4) {
+      const complemento = faltando.length ? ` Inclua ${faltando.join(', ')}.` : '';
+      definirFeedbackInline(passwordStrengthFeedback, 'warn', `Senha média.${complemento}`);
+      return;
+    }
+    const complemento = faltando.length ? ` Inclua ${faltando.join(', ')}.` : '';
+    definirFeedbackInline(passwordStrengthFeedback, 'bad', `Senha fraca.${complemento}`);
+  };
+
+  const atualizarConfirmacaoSenha = () => {
+    if (!passwordConfirmGroup || passwordConfirmGroup.classList.contains('hidden')) {
+      limparFeedbackInline(passwordMatchFeedback);
+      return;
+    }
+    const senha = passwordInput.value.trim();
+    const confirmacao = passwordConfirmInput.value.trim();
+    if (!senha && !confirmacao) {
+      limparFeedbackInline(passwordMatchFeedback);
+      return;
+    }
+    if (!senha) {
+      definirFeedbackInline(passwordMatchFeedback, 'bad', 'Digite a senha antes de confirmar.');
+      return;
+    }
+    if (!confirmacao) {
+      definirFeedbackInline(passwordMatchFeedback, 'warn', 'Repita a senha para validar.');
+      return;
+    }
+    if (senha === confirmacao) {
+      definirFeedbackInline(passwordMatchFeedback, 'good', 'As senhas conferem.');
+    } else {
+      definirFeedbackInline(passwordMatchFeedback, 'bad', 'As senhas não conferem.');
+    }
+  };
+
   const setAuthMode = mode => {
     authState.mode = mode;
     resetAuthMensagens();
@@ -148,6 +230,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     passwordInput.value = '';
     if (passwordConfirmInput) passwordConfirmInput.value = '';
+    atualizarFeedbackSenha();
+    atualizarConfirmacaoSenha();
   };
 
   const handleAuthenticated = () => {
@@ -547,6 +631,13 @@ document.addEventListener('DOMContentLoaded', () => {
       finalizarAuthSubmit();
     }
   });
+
+  passwordInput.addEventListener('input', () => {
+    atualizarFeedbackSenha();
+    atualizarConfirmacaoSenha();
+  });
+
+  passwordConfirmInput.addEventListener('input', atualizarConfirmacaoSenha);
 
   btnAuthSwitch.addEventListener('click', () => {
     if (authState.mode === 'login') {

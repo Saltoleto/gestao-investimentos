@@ -538,6 +538,25 @@ select:focus {
   font-weight: 600;
 }
 
+.input-feedback {
+  margin: 6px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.input-feedback.good {
+  color: var(--success);
+}
+
+.input-feedback.warn {
+  color: #d97706;
+}
+
+.input-feedback.bad {
+  color: var(--danger);
+}
+
 .info {
   color: var(--muted);
   font-style: italic;
