@@ -17,6 +17,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnLimparFiltros = document.getElementById('btn-limpar-filtros');
   const totaisSection = document.getElementById('totais-section');
   const toastContainer = document.getElementById('toast-container');
+  const pwaInstallCard = document.getElementById('pwa-install');
+  const pwaInstallButton = document.getElementById('pwa-install-button');
+  const pwaInstallDismiss = document.getElementById('pwa-install-dismiss');
+  const pwaInstallHint = document.getElementById('pwa-install-hint');
 
   const emailInput = document.getElementById('email');
   const passwordInput = document.getElementById('password');
@@ -51,6 +55,92 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const formatarDataBR = d => d ? d.split('T')[0].split('-').reverse().join('/') : '';
   const formatarMoeda = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+  const isIos = () => /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isInStandaloneMode = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  const pwaInstallState = {
+    deferredPrompt: null
+  };
+
+  function ocultarPwaInstall() {
+    if (pwaInstallCard) {
+      pwaInstallCard.classList.add('hidden');
+    }
+  }
+
+  function exibirPwaInstall() {
+    if (pwaInstallCard) {
+      pwaInstallCard.classList.remove('hidden');
+    }
+  }
+
+  function prepararPwaInstall() {
+    if (!pwaInstallCard) return;
+
+    if (isInStandaloneMode()) {
+      ocultarPwaInstall();
+      return;
+    }
+
+    if (pwaInstallState.deferredPrompt) {
+      if (pwaInstallHint) {
+        pwaInstallHint.classList.add('hidden');
+      }
+      exibirPwaInstall();
+      return;
+    }
+
+    if (isIos()) {
+      if (pwaInstallHint) {
+        pwaInstallHint.textContent = 'No iPhone/iPad, toque em Compartilhar e selecione "Adicionar à Tela de Início".';
+        pwaInstallHint.classList.remove('hidden');
+      }
+      if (pwaInstallButton) {
+        pwaInstallButton.classList.add('hidden');
+      }
+      exibirPwaInstall();
+    } else {
+      ocultarPwaInstall();
+    }
+  }
+
+  window.addEventListener('beforeinstallprompt', event => {
+    event.preventDefault();
+    pwaInstallState.deferredPrompt = event;
+    if (pwaInstallButton) {
+      pwaInstallButton.classList.remove('hidden');
+    }
+    prepararPwaInstall();
+  });
+
+  window.addEventListener('appinstalled', () => {
+    pwaInstallState.deferredPrompt = null;
+    ocultarPwaInstall();
+    showToast('Aplicativo instalado', 'O app foi adicionado à sua tela inicial.', 'success');
+  });
+
+  if (pwaInstallButton) {
+    pwaInstallButton.addEventListener('click', async () => {
+      if (!pwaInstallState.deferredPrompt) return;
+      pwaInstallState.deferredPrompt.prompt();
+      const choiceResult = await pwaInstallState.deferredPrompt.userChoice;
+      if (choiceResult.outcome === 'accepted') {
+        showToast('Instalação iniciada', 'Aguarde a conclusão do processo.', 'success');
+      } else {
+        showToast('Instalação cancelada', 'Você pode instalar quando quiser.', 'info');
+      }
+      pwaInstallState.deferredPrompt = null;
+      ocultarPwaInstall();
+    });
+  }
+
+  if (pwaInstallDismiss) {
+    pwaInstallDismiss.addEventListener('click', () => {
+      ocultarPwaInstall();
+    });
+  }
+
+  prepararPwaInstall();
 
   valorInput.addEventListener('input', () => {
     let v = valorInput.value.replace(/\D/g, '');
