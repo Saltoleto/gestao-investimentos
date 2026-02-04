@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
     authState.mode = mode;
     resetAuthMensagens();
     if (btnNovo) {
-      const ocultarCriar = mode === 'login' || mode === 'signup';
+      const ocultarCriar = mode === 'login' || mode === 'signup' || mode === 'recover';
       btnNovo.classList.toggle('hidden', ocultarCriar);
     }
     if (mode === 'login') {
