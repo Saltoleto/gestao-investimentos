@@ -130,8 +130,14 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
   gap: 12px;
+  margin-bottom: 0;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .filter-header h3 {
@@ -139,10 +145,18 @@ body {
   font-size: 16px;
 }
 
+.filter-body {
+  margin-top: 12px;
+}
+
 .filter-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 12px 16px;
+}
+
+.filter-card.collapsed .filter-body {
+  display: none;
 }
 
 .section-title {

@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const filtroTipo = document.getElementById('filtro-tipo');
   const filtroLiquidez = document.getElementById('filtro-liquidez');
   const btnLimparFiltros = document.getElementById('btn-limpar-filtros');
+  const btnToggleFiltros = document.getElementById('btn-toggle-filtros');
+  const filterCard = document.querySelector('.filter-card');
   const totaisSection = document.getElementById('totais-section');
   const toastContainer = document.getElementById('toast-container');
   const pwaInstallCard = document.getElementById('pwa-install');
@@ -221,6 +223,31 @@ document.addEventListener('DOMContentLoaded', () => {
     filtroLiquidez.value = '';
     aplicarFiltros();
   });
+
+  function atualizarTextoFiltro(colapsado) {
+    if (!btnToggleFiltros) return;
+    btnToggleFiltros.textContent = colapsado ? 'Mostrar filtros' : 'Ocultar filtros';
+    btnToggleFiltros.setAttribute('aria-expanded', String(!colapsado));
+  }
+
+  function definirFiltrosColapsados(colapsado, persistir = true) {
+    if (!filterCard) return;
+    filterCard.classList.toggle('collapsed', colapsado);
+    atualizarTextoFiltro(colapsado);
+    if (persistir) {
+      localStorage.setItem('filtrosColapsados', colapsado ? '1' : '0');
+    }
+  }
+
+  if (btnToggleFiltros && filterCard) {
+    const filtrosSalvos = localStorage.getItem('filtrosColapsados');
+    const iniciarColapsado = filtrosSalvos ? filtrosSalvos === '1' : true;
+    definirFiltrosColapsados(iniciarColapsado, false);
+    btnToggleFiltros.addEventListener('click', () => {
+      const colapsado = filterCard.classList.contains('collapsed');
+      definirFiltrosColapsados(!colapsado);
+    });
+  }
 
   // HABILITA/DESABILITA VENCIMENTO SEGUNDO LIQUIDEZ
   function atualizarVencimento() {
