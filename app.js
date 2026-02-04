@@ -116,6 +116,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const setAuthMode = mode => {
     authState.mode = mode;
     resetAuthMensagens();
+    if (btnNovo) {
+      const ocultarCriar = mode === 'login' || mode === 'signup';
+      btnNovo.classList.toggle('hidden', ocultarCriar);
+    }
     if (mode === 'login') {
       authTitle.innerText = 'Entrar';
       authHelper.innerText = 'Gerencie seus investimentos com uma visão clara e segura.';
@@ -165,6 +169,9 @@ document.addEventListener('DOMContentLoaded', () => {
     authDiv.classList.add('hidden');
     listaSection.classList.remove('hidden');
     formSection.classList.add('hidden');
+    if (btnNovo) {
+      btnNovo.classList.remove('hidden');
+    }
     if (btnLogout) {
       btnLogout.classList.remove('hidden');
     }
