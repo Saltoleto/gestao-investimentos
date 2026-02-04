@@ -70,12 +70,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 4200);
   };
 
-  const setFeedback = (target, title, message, type = 'error') => {
+  const setFeedback = (target, title, message, type = 'error', showToastMessage = true) => {
     const formattedMessage = formatarMensagemFeedback(message);
     if (target) {
       target.innerText = formattedMessage;
     }
-    showToast(title, formattedMessage, type);
+    if (showToastMessage) {
+      showToast(title, formattedMessage, type);
+    }
   };
 
   const montarMensagemErro = (contexto, erro) => {
@@ -169,19 +171,16 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     atualizarListaRegrasSenha(senha);
-    const { okCount, faltando } = avaliarForcaSenha(senha);
-    const total = regrasSenha.length;
+    const { okCount } = avaliarForcaSenha(senha);
     if (okCount >= 5 && senha.length >= 12) {
-      definirFeedbackInline(passwordStrengthFeedback, 'good', `Senha forte. Você atendeu ${okCount} de ${total} requisitos.`);
+      definirFeedbackInline(passwordStrengthFeedback, 'good', 'Senha forte.');
       return;
     }
     if (okCount >= 4) {
-      const complemento = faltando.length ? ` Ajuste: ${faltando.join(', ')}.` : ' Você pode deixá-la ainda mais segura.';
-      definirFeedbackInline(passwordStrengthFeedback, 'warn', `Senha razoável. Você atendeu ${okCount} de ${total} requisitos.${complemento}`);
+      definirFeedbackInline(passwordStrengthFeedback, 'warn', 'Senha boa. Adicione mais um requisito para reforçar.');
       return;
     }
-    const complemento = faltando.length ? ` Ajuste: ${faltando.join(', ')}.` : ' Use 12+ caracteres com letras, números e símbolos.';
-    definirFeedbackInline(passwordStrengthFeedback, 'bad', `Senha fraca. Você atendeu ${okCount} de ${total} requisitos.${complemento}`);
+    definirFeedbackInline(passwordStrengthFeedback, 'bad', 'Senha fraca. Use 8+ caracteres com letras, números e símbolos.');
   };
 
   const atualizarConfirmacaoSenha = () => {
@@ -204,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     if (senha === confirmacao) {
-      definirFeedbackInline(passwordMatchFeedback, 'good', 'As senhas conferem.');
+      limparFeedbackInline(passwordMatchFeedback);
     } else {
       definirFeedbackInline(passwordMatchFeedback, 'bad', 'As senhas não conferem. Verifique letras maiúsculas e caracteres especiais.');
     }
@@ -235,7 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
       passwordConfirmGroup.classList.remove('hidden');
       passwordStrengthFeedback.classList.remove('hidden');
       if (passwordRulesList) {
-        passwordRulesList.classList.remove('hidden');
+        passwordRulesList.classList.add('hidden');
       }
       btnLogin.innerText = 'Criar conta';
       btnAuthSwitch.innerText = 'Já tenho conta';
@@ -559,7 +558,8 @@ document.addEventListener('DOMContentLoaded', () => {
           authError,
           'Dados incompletos',
           'Preencha e-mail, senha e confirmação para continuar.',
-          'error'
+          'error',
+          false
         );
         finalizarAuthSubmit();
         return;
@@ -569,7 +569,8 @@ document.addEventListener('DOMContentLoaded', () => {
           authError,
           'Senhas diferentes',
           'As senhas não conferem. Verifique as senhas digitadas.',
-          'error'
+          'error',
+          false
         );
         finalizarAuthSubmit();
         return;
@@ -587,14 +588,16 @@ document.addEventListener('DOMContentLoaded', () => {
             authError,
             'Limite de tentativas',
             'Limite de tentativas atingido. Aguarde alguns minutos e tente novamente.',
-            'error'
+            'error',
+            false
           );
         } else {
           setFeedback(
             authError,
             'Não foi possível criar a conta',
             montarMensagemErro('Não foi possível criar a conta.', error),
-            'error'
+            'error',
+            false
           );
         }
         finalizarAuthSubmit();
