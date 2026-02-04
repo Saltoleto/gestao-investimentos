@@ -285,40 +285,37 @@ document.addEventListener('DOMContentLoaded', () => {
     lista.innerHTML = '';
     if (!investimentos.length) {
       const mensagem = investimentosCache.length ? 'Nenhum investimento encontrado com os filtros atuais' : 'Nenhum investimento cadastrado';
-      lista.innerHTML = `<p class="info">${mensagem}</p>`;
+      lista.innerHTML = `
+        <div class="empty-state">
+          <span aria-hidden="true">📭</span>
+          <p>${mensagem}</p>
+          <small>Experimente ajustar os filtros ou cadastre um novo aporte.</small>
+        </div>
+      `;
       return;
     }
 
     investimentos.forEach(i => {
       const div = document.createElement('div'); div.className = 'investimento-card';
       div.innerHTML = `
-        <div class="investimento-content">
+        <div class="investimento-header">
           <div>
-            <span class="label">Banco/Corretora</span>
-            <span class="value">${i.banco}</span>
+            <span class="investimento-title">${i.banco}</span>
+            <span class="investimento-subtitle">${i.tipo_produto}</span>
           </div>
-          <div>
-            <span class="label">Produto</span>
-            <span class="value">${i.tipo_produto}</span>
-          </div>
-          <div>
-            <span class="label">Descrição</span>
-            <span class="value">${i.descricao_produto || '-'}</span>
-          </div>
-          <div>
-            <span class="label">Valor</span>
-            <span class="value destaque">${formatarMoeda(i.valor)}</span>
-          </div>
+          <div class="investimento-value">${formatarMoeda(i.valor)}</div>
+        </div>
+        <div class="investimento-tags">
+          <span class="badge">${i.liquidez}</span>
+          <span class="badge neutral">${i.descricao_produto || 'Sem descrição'}</span>
+        </div>
+        <div class="investimento-meta">
           <div>
             <span class="label">Data de Aporte</span>
             <span class="value">${formatarDataBR(i.data_aporte)}</span>
           </div>
           <div>
-            <span class="label">Liquidez</span>
-            <span class="value badge">${i.liquidez}</span>
-          </div>
-          <div>
-            <span class="label">Data de Vencimento</span>
+            <span class="label">Vencimento</span>
             <span class="value">${i.data_vencimento ? formatarDataBR(i.data_vencimento) : '-'}</span>
           </div>
         </div>
