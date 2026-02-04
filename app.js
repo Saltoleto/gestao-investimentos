@@ -146,15 +146,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     const { okCount, faltando } = avaliarForcaSenha(senha);
     if (okCount >= 5 && senha.length >= 12) {
-      definirFeedbackInline(passwordStrengthFeedback, 'good', 'Senha forte.');
+      definirFeedbackInline(passwordStrengthFeedback, 'good', 'Senha forte. Boa escolha!');
       return;
     }
     if (okCount >= 4) {
-      const complemento = faltando.length ? ` Inclua ${faltando.join(', ')}.` : '';
-      definirFeedbackInline(passwordStrengthFeedback, 'warn', `Senha média.${complemento}`);
+      const complemento = faltando.length ? ` Para melhorar, adicione ${faltando.join(', ')}.` : ' Você pode deixá-la ainda mais segura.';
+      definirFeedbackInline(passwordStrengthFeedback, 'warn', `Senha razoável.${complemento}`);
       return;
     }
-    const complemento = faltando.length ? ` Inclua ${faltando.join(', ')}.` : '';
+    const complemento = faltando.length ? ` Para fortalecer, adicione ${faltando.join(', ')}.` : ' Use 12+ caracteres com letras, números e símbolos.';
     definirFeedbackInline(passwordStrengthFeedback, 'bad', `Senha fraca.${complemento}`);
   };
 
@@ -170,17 +170,17 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     if (!senha) {
-      definirFeedbackInline(passwordMatchFeedback, 'bad', 'Digite a senha antes de confirmar.');
+      definirFeedbackInline(passwordMatchFeedback, 'bad', 'Digite a senha acima para confirmar.');
       return;
     }
     if (!confirmacao) {
-      definirFeedbackInline(passwordMatchFeedback, 'warn', 'Repita a senha para validar.');
+      definirFeedbackInline(passwordMatchFeedback, 'warn', 'Repita exatamente a mesma senha.');
       return;
     }
     if (senha === confirmacao) {
       definirFeedbackInline(passwordMatchFeedback, 'good', 'As senhas conferem.');
     } else {
-      definirFeedbackInline(passwordMatchFeedback, 'bad', 'As senhas não conferem.');
+      definirFeedbackInline(passwordMatchFeedback, 'bad', 'As senhas não conferem. Verifique letras maiúsculas e caracteres especiais.');
     }
   };
 
