@@ -47,6 +47,15 @@ body {
   align-items: flex-start;
 }
 
+.page-header-top {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
 .page-title-shell {
   display: inline-flex;
   align-items: center;
