@@ -565,21 +565,22 @@ select:focus {
 
 .investimento-acoes {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   justify-content: flex-end;
-  align-self: flex-start;
-  flex-wrap: wrap;
+  align-self: stretch;
+  flex-wrap: nowrap;
   align-items: center;
+  width: 100%;
 }
 
 .investimento-acoes button {
-  flex: 0 0 auto;
-  min-width: 120px;
-  padding: 10px 14px;
-  font-size: 14px;
-  font-weight: bold;
+  flex: 1;
+  min-width: 0;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
   transition: background 0.2s;
-  border-radius: 10px;
+  border-radius: 999px;
 }
 
 .investimento-acoes .btn-editar {
@@ -941,13 +942,17 @@ select:focus {
 
   .investimento-acoes {
     flex-direction: column;
-    align-items: stretch;
+    align-items: flex-end;
     justify-content: flex-start;
+    align-self: flex-start;
+    width: auto;
   }
 
   .investimento-acoes button {
-    min-width: 140px;
-    width: 100%;
+    min-width: 120px;
+    width: auto;
+    flex: 0 0 auto;
+    padding: 8px 14px;
   }
 
   .totais-grid {
