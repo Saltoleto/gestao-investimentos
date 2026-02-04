@@ -77,6 +77,34 @@ body {
   box-shadow: var(--shadow);
 }
 
+.pwa-install {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  border: 1px solid rgba(76, 111, 255, 0.25);
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.95) 0%, rgba(237, 242, 255, 0.9) 100%);
+}
+
+.pwa-install-text {
+  flex: 1 1 320px;
+  display: grid;
+  gap: 6px;
+}
+
+.pwa-install-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pwa-install-hint {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
 .card-spacing {
   margin-bottom: 24px;
 }
