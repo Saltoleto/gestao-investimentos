@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const filtroLiquidez = document.getElementById('filtro-liquidez');
   const btnLimparFiltros = document.getElementById('btn-limpar-filtros');
   const totaisSection = document.getElementById('totais-section');
+  const toastContainer = document.getElementById('toast-container');
 
   const emailInput = document.getElementById('email');
   const passwordInput = document.getElementById('password');
@@ -30,6 +31,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const formError = document.getElementById('form-error');
   const formSuccess = document.getElementById('form-success');
   const liquidezRadios = document.querySelectorAll('input[name="liquidez"]');
+  const authError = document.getElementById('auth-error');
+
+  const showToast = (title, message, type = 'info') => {
+    if (!toastContainer) return;
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `<strong>${title}</strong><p>${message}</p>`;
+    toastContainer.appendChild(toast);
+    setTimeout(() => {
+      toast.remove();
+    }, 4200);
+  };
 
   const bancos = ["Banco do Brasil", "Bradesco", "BTG Pactual", "Caixa Econômica Federal", "Itaú", "Inter", "Nubank", "Original", "Rico", "Santander", "Safra", "XP"].sort();
   const tiposProdutos = ["CDB", "LCI", "LCA", "Tesouro Direto", "Fundos de Renda Fixa", "Ações", "ETFs", "Fundos Imobiliários", "Debêntures", "CRI/CRA"].sort();
@@ -133,17 +146,32 @@ document.addEventListener('DOMContentLoaded', () => {
   // LOGIN
   btnLogin.addEventListener('click', async () => {
     formError.innerText = '';
+    authError.innerText = '';
+    if (!emailInput.value || !passwordInput.value) {
+      authError.innerText = 'Informe email e senha para continuar.';
+      showToast('Dados incompletos', 'Preencha email e senha para acessar.', 'error');
+      return;
+    }
     const { data, error } = await supabase.auth.signInWithPassword({ email: emailInput.value, password: passwordInput.value });
-    if (error) { document.getElementById('auth-error').innerText = error.message; return; }
+    if (error) {
+      authError.innerText = error.message;
+      showToast('Não foi possível entrar', error.message, 'error');
+      return;
+    }
     const { data: sessionData } = await supabase.auth.getSession();
     if (sessionData.session) {
       authDiv.classList.add('hidden'); listaSection.classList.remove('hidden'); formSection.classList.add('hidden'); carregarInvestimentos();
-    } else document.getElementById('auth-error').innerText = 'Falha ao autenticar';
+      showToast('Bem-vindo!', 'Login realizado com sucesso.', 'success');
+    } else {
+      authError.innerText = 'Falha ao autenticar';
+      showToast('Falha ao autenticar', 'Tente novamente em instantes.', 'error');
+    }
   });
 
   btnLogout.addEventListener('click', async () => {
     await supabase.auth.signOut();
     authDiv.classList.remove('hidden'); listaSection.classList.add('hidden'); formSection.classList.add('hidden');
+    showToast('Sessão encerrada', 'Você saiu da aplicação com segurança.', 'info');
   });
 
   // NOVO
@@ -159,6 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
     formSection.classList.add('hidden'); listaSection.classList.remove('hidden'); investimentoEditandoId = null; form.reset();
     bancoSearch.value = ''; tipoInput.value = ''; descricaoInput.value = ''; formError.innerText = ''; formSuccess.innerText = '';
     atualizarVencimento();
+    showToast('Ação cancelada', 'O aporte não foi alterado.', 'info');
   });
 
   // LISTAR INVESTIMENTOS
@@ -219,7 +248,12 @@ document.addEventListener('DOMContentLoaded', () => {
       div.querySelector('.btn-excluir').addEventListener('click', async () => {
         if (!confirm('Deseja excluir este investimento?')) return;
         const { error } = await supabase.from('investimentos').delete().eq('id', i.id);
-        if (!error) carregarInvestimentos();
+        if (error) {
+          showToast('Erro ao excluir', error.message, 'error');
+          return;
+        }
+        showToast('Investimento excluído', 'Registro removido com sucesso.', 'success');
+        carregarInvestimentos();
       });
       lista.appendChild(div);
     });
@@ -400,7 +434,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!userData.user) return;
 
     const { data, error } = await supabase.from('investimentos').select('*').eq('usuario_id', userData.user.id).order('data_aporte', { ascending: false });
-    if (error) { lista.innerHTML = '<p class="error">Erro ao carregar investimentos</p>'; return; }
+    if (error) {
+      lista.innerHTML = '<p class="error">Erro ao carregar investimentos</p>';
+      showToast('Erro ao carregar', 'Não foi possível obter os investimentos.', 'error');
+      return;
+    }
 
     investimentosCache = data || [];
     atualizarFiltrosComDados(investimentosCache);
@@ -411,11 +449,28 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('submit', async e => {
     e.preventDefault(); formError.innerText = ''; formSuccess.innerText = '';
     const { data: userData } = await supabase.auth.getUser();
-    if (!userData.user) { formError.innerText = 'Sessão inválida'; return; }
+    if (!userData.user) {
+      formError.innerText = 'Sessão inválida';
+      showToast('Sessão inválida', 'Faça login novamente para continuar.', 'error');
+      return;
+    }
     const valor = parseFloat(valorInput.value.replace(/\./g, '').replace(',', '.'));
-    if (!valor || valor <= 0) { formError.innerText = 'Valor inválido'; return; }
+    if (!valor || valor <= 0) {
+      formError.innerText = 'Valor inválido';
+      showToast('Valor inválido', 'Informe um valor maior que zero.', 'error');
+      return;
+    }
+    if (!bancoSearch.value || !tipoInput.value || !dataInput.value) {
+      formError.innerText = 'Preencha banco, tipo e data.';
+      showToast('Campos obrigatórios', 'Banco, tipo e data são obrigatórios.', 'error');
+      return;
+    }
     const liquidez = document.querySelector('input[name="liquidez"]:checked').value;
-    if (liquidez === 'No vencimento' && !vencimentoInput.value) { formError.innerText = 'Data de Vencimento obrigatória'; return; }
+    if (liquidez === 'No vencimento' && !vencimentoInput.value) {
+      formError.innerText = 'Data de Vencimento obrigatória';
+      showToast('Vencimento obrigatório', 'Informe a data de vencimento para liquidez no vencimento.', 'error');
+      return;
+    }
 
     const payload = { banco: bancoSearch.value, tipo_produto: tipoInput.value, descricao_produto: descricaoInput.value, valor, liquidez, data_aporte: dataInput.value, 
       data_vencimento: liquidez === 'No vencimento' ? vencimentoInput.value : null
@@ -424,11 +479,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (investimentoEditandoId) ({ error } = await supabase.from('investimentos').update(payload).eq('id', investimentoEditandoId));
     else { payload.usuario_id = userData.user.id; ({ error } = await supabase.from('investimentos').insert(payload)); }
 
-    if (error) formError.innerText = error.message;
-    else {
+    if (error) {
+      formError.innerText = error.message;
+      showToast('Erro ao salvar', error.message, 'error');
+    } else {
       investimentoEditandoId = null; form.reset(); bancoSearch.value = ''; tipoInput.value = ''; descricaoInput.value = '';
       btnSubmit.innerText = 'Salvar'; document.getElementById('form-title').innerText = 'Novo';
       formSection.classList.add('hidden'); listaSection.classList.remove('hidden'); formSuccess.innerText = 'Investimento salvo com sucesso!';
+      showToast('Investimento salvo', 'Registro atualizado com sucesso.', 'success');
       atualizarVencimento();
       carregarInvestimentos();
     }
@@ -439,4 +497,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const { data: sessionData } = await supabase.auth.getSession();
     if (sessionData.session) { authDiv.classList.add('hidden'); listaSection.classList.remove('hidden'); carregarInvestimentos(); }
   })();
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./service-worker.js').catch(() => {
+      showToast('PWA', 'Não foi possível ativar o modo offline.', 'error');
+    });
+  }
 });
