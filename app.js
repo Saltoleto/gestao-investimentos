@@ -33,9 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const emailGroup = document.getElementById('email-group');
   const passwordGroup = document.getElementById('password-group');
   const passwordConfirmGroup = document.getElementById('password-confirm-group');
-  const passwordStrengthFeedback = document.getElementById('password-strength');
-  const passwordRulesList = document.getElementById('password-rules');
-  const passwordMatchFeedback = document.getElementById('password-match');
   const authTitle = document.getElementById('auth-title');
   const authHelper = document.getElementById('auth-helper');
   const valorInput = document.getElementById('valor');
@@ -107,108 +104,6 @@ document.addEventListener('DOMContentLoaded', () => {
     formError.innerText = '';
   };
 
-  const limparFeedbackInline = target => {
-    if (!target) return;
-    target.textContent = '';
-    target.classList.remove('good', 'warn', 'bad');
-  };
-
-  const definirFeedbackInline = (target, status, message) => {
-    if (!target) return;
-    target.textContent = message;
-    target.classList.remove('good', 'warn', 'bad');
-    if (status) {
-      target.classList.add(status);
-    }
-  };
-
-  const regrasSenha = [
-    { id: 'length-8', label: 'Mínimo de 8 caracteres', test: value => value.length >= 8 },
-    { id: 'length-12', label: '12+ caracteres para reforçar a segurança', test: value => value.length >= 12 },
-    { id: 'upper', label: 'Pelo menos 1 letra maiúscula', test: value => /[A-Z]/.test(value) },
-    { id: 'lower', label: 'Pelo menos 1 letra minúscula', test: value => /[a-z]/.test(value) },
-    { id: 'number', label: 'Pelo menos 1 número', test: value => /\d/.test(value) },
-    { id: 'symbol', label: 'Pelo menos 1 símbolo', test: value => /[^A-Za-z0-9]/.test(value) }
-  ];
-
-  if (passwordRulesList) {
-    passwordRulesList.innerHTML = regrasSenha.map(regra => `<li data-rule="${regra.id}">${regra.label}</li>`).join('');
-  }
-
-  const avaliarForcaSenha = senha => {
-    const resultados = regrasSenha.map(regra => ({ ...regra, ok: regra.test(senha) }));
-    const okCount = resultados.filter(regra => regra.ok).length;
-    const faltando = resultados.filter(regra => !regra.ok).map(regra => regra.label);
-    return { okCount, faltando };
-  };
-
-  const atualizarListaRegrasSenha = senha => {
-    if (!passwordRulesList || passwordRulesList.classList.contains('hidden')) {
-      return;
-    }
-    const itens = passwordRulesList.querySelectorAll('li');
-    itens.forEach(item => {
-      const regra = regrasSenha.find(regraItem => regraItem.id === item.dataset.rule);
-      if (!regra) return;
-      if (!senha) {
-        item.classList.remove('met');
-        return;
-      }
-      item.classList.toggle('met', regra.test(senha));
-    });
-  };
-
-  const atualizarFeedbackSenha = () => {
-    if (!passwordGroup || passwordGroup.classList.contains('hidden') || passwordStrengthFeedback.classList.contains('hidden')) {
-      limparFeedbackInline(passwordStrengthFeedback);
-      atualizarListaRegrasSenha('');
-      return;
-    }
-    const senha = passwordInput.value.trim();
-    if (!senha) {
-      limparFeedbackInline(passwordStrengthFeedback);
-      atualizarListaRegrasSenha('');
-      return;
-    }
-    atualizarListaRegrasSenha(senha);
-    const { okCount } = avaliarForcaSenha(senha);
-    if (okCount >= 5 && senha.length >= 12) {
-      definirFeedbackInline(passwordStrengthFeedback, 'good', 'Senha forte.');
-      return;
-    }
-    if (okCount >= 4) {
-      definirFeedbackInline(passwordStrengthFeedback, 'warn', 'Senha boa. Adicione mais um requisito para reforçar.');
-      return;
-    }
-    definirFeedbackInline(passwordStrengthFeedback, 'bad', 'Senha fraca. Use 8+ caracteres com letras, números e símbolos.');
-  };
-
-  const atualizarConfirmacaoSenha = () => {
-    if (!passwordConfirmGroup || passwordConfirmGroup.classList.contains('hidden')) {
-      limparFeedbackInline(passwordMatchFeedback);
-      return;
-    }
-    const senha = passwordInput.value.trim();
-    const confirmacao = passwordConfirmInput.value.trim();
-    if (!senha && !confirmacao) {
-      limparFeedbackInline(passwordMatchFeedback);
-      return;
-    }
-    if (!senha) {
-      definirFeedbackInline(passwordMatchFeedback, 'bad', 'Digite a senha acima para confirmar.');
-      return;
-    }
-    if (!confirmacao) {
-      definirFeedbackInline(passwordMatchFeedback, 'warn', 'Repita exatamente a mesma senha.');
-      return;
-    }
-    if (senha === confirmacao) {
-      limparFeedbackInline(passwordMatchFeedback);
-    } else {
-      definirFeedbackInline(passwordMatchFeedback, 'bad', 'As senhas não conferem. Verifique letras maiúsculas e caracteres especiais.');
-    }
-  };
-
   const setAuthMode = mode => {
     authState.mode = mode;
     resetAuthMensagens();
@@ -218,10 +113,6 @@ document.addEventListener('DOMContentLoaded', () => {
       emailGroup.classList.remove('hidden');
       passwordGroup.classList.remove('hidden');
       passwordConfirmGroup.classList.add('hidden');
-      passwordStrengthFeedback.classList.add('hidden');
-      if (passwordRulesList) {
-        passwordRulesList.classList.add('hidden');
-      }
       btnLogin.innerText = 'Entrar';
       btnAuthSwitch.innerText = 'Criar conta';
       btnAuthSwitch.classList.remove('hidden');
@@ -232,10 +123,6 @@ document.addEventListener('DOMContentLoaded', () => {
       emailGroup.classList.remove('hidden');
       passwordGroup.classList.remove('hidden');
       passwordConfirmGroup.classList.remove('hidden');
-      passwordStrengthFeedback.classList.remove('hidden');
-      if (passwordRulesList) {
-        passwordRulesList.classList.add('hidden');
-      }
       btnLogin.innerText = 'Criar conta';
       btnAuthSwitch.innerText = 'Já tenho conta';
       btnAuthSwitch.classList.remove('hidden');
@@ -246,10 +133,6 @@ document.addEventListener('DOMContentLoaded', () => {
       emailGroup.classList.remove('hidden');
       passwordGroup.classList.add('hidden');
       passwordConfirmGroup.classList.add('hidden');
-      passwordStrengthFeedback.classList.add('hidden');
-      if (passwordRulesList) {
-        passwordRulesList.classList.add('hidden');
-      }
       btnLogin.innerText = 'Enviar link';
       btnAuthSwitch.innerText = 'Voltar ao login';
       btnAuthSwitch.classList.remove('hidden');
@@ -260,10 +143,6 @@ document.addEventListener('DOMContentLoaded', () => {
       emailGroup.classList.add('hidden');
       passwordGroup.classList.remove('hidden');
       passwordConfirmGroup.classList.remove('hidden');
-      passwordStrengthFeedback.classList.remove('hidden');
-      if (passwordRulesList) {
-        passwordRulesList.classList.remove('hidden');
-      }
       btnLogin.innerText = 'Atualizar senha';
       btnAuthSwitch.innerText = 'Voltar ao login';
       btnAuthSwitch.classList.remove('hidden');
@@ -271,8 +150,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     passwordInput.value = '';
     if (passwordConfirmInput) passwordConfirmInput.value = '';
-    atualizarFeedbackSenha();
-    atualizarConfirmacaoSenha();
   };
 
   const handleAuthenticated = () => {
@@ -677,12 +554,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  passwordInput.addEventListener('input', () => {
-    atualizarFeedbackSenha();
-    atualizarConfirmacaoSenha();
-  });
-
-  passwordConfirmInput.addEventListener('input', atualizarConfirmacaoSenha);
 
   btnAuthSwitch.addEventListener('click', () => {
     if (authState.mode === 'login') {
