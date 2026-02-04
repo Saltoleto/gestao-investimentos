@@ -42,32 +42,31 @@ body {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  max-width: 620px;
-  margin: 0 auto;
-  text-align: center;
-  align-items: center;
+  margin: 0;
+  text-align: left;
+  align-items: flex-start;
 }
 
 .page-title-shell {
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  padding: 14px 22px;
-  border-radius: 18px;
-  border: 1px solid rgba(76, 111, 255, 0.2);
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: var(--shadow-soft);
+  padding: 0;
+  border-radius: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
 }
 
 .page-title {
   margin: 0;
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 700;
   letter-spacing: -0.02em;
 }
 
 .page-title-icon {
-  font-size: 30px;
+  font-size: 26px;
 }
 
 .subtitle {
