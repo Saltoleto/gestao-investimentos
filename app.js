@@ -49,15 +49,37 @@ document.addEventListener('DOMContentLoaded', () => {
   const authError = document.getElementById('auth-error');
   let authSubmitting = false;
 
+  const formatarMensagemFeedback = message => {
+    if (!message) return '';
+    const trimmed = message.trim();
+    return /[.!?]$/.test(trimmed) ? trimmed : `${trimmed}.`;
+  };
+
   const showToast = (title, message, type = 'info') => {
     if (!toastContainer) return;
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
-    toast.innerHTML = `<strong>${title}</strong><p>${message}</p>`;
+    const formattedMessage = formatarMensagemFeedback(message);
+    toast.innerHTML = `<strong>${title}</strong><p>${formattedMessage}</p>`;
     toastContainer.appendChild(toast);
     setTimeout(() => {
       toast.remove();
     }, 4200);
+  };
+
+  const setFeedback = (target, title, message, type = 'error') => {
+    const formattedMessage = formatarMensagemFeedback(message);
+    if (target) {
+      target.innerText = formattedMessage;
+    }
+    showToast(title, formattedMessage, type);
+  };
+
+  const montarMensagemErro = (contexto, erro) => {
+    if (erro?.message) {
+      return `${contexto} ${erro.message}`;
+    }
+    return contexto;
   };
 
   const bancos = ["Banco do Brasil", "Bradesco", "BTG Pactual", "Caixa Econômica Federal", "Itaú", "Inter", "Nubank", "Original", "Rico", "Santander", "Safra", "XP"].sort();
@@ -359,21 +381,33 @@ document.addEventListener('DOMContentLoaded', () => {
     formError.innerText = '';
     authError.innerText = '';
     if (!isSecureAuthContext()) {
-      authError.innerText = 'Conexão insegura. Utilize HTTPS para proteger seus dados.';
-      showToast('Conexão insegura', 'Use HTTPS para enviar suas credenciais com segurança.', 'error');
+      setFeedback(
+        authError,
+        'Conexão insegura',
+        'Conexão insegura. Use HTTPS para proteger seus dados.',
+        'error'
+      );
       return;
     }
     if (authState.mode === 'login') {
       if (!emailInput.value || !passwordInput.value) {
-        authError.innerText = 'Informe email e senha para continuar.';
-        showToast('Dados incompletos', 'Preencha email e senha para acessar.', 'error');
+        setFeedback(
+          authError,
+          'Dados incompletos',
+          'Preencha e-mail e senha para continuar.',
+          'error'
+        );
         finalizarAuthSubmit();
         return;
       }
       const { error } = await supabase.auth.signInWithPassword({ email: emailInput.value, password: passwordInput.value });
       if (error) {
-        authError.innerText = error.message;
-        showToast('Não foi possível entrar', error.message, 'error');
+        setFeedback(
+          authError,
+          'Não foi possível entrar',
+          montarMensagemErro('Não foi possível entrar.', error),
+          'error'
+        );
         finalizarAuthSubmit();
         return;
       }
@@ -382,8 +416,12 @@ document.addEventListener('DOMContentLoaded', () => {
         handleAuthenticated();
         showToast('Bem-vindo!', 'Login realizado com sucesso.', 'success');
       } else {
-        authError.innerText = 'Falha ao autenticar';
-        showToast('Falha ao autenticar', 'Tente novamente em instantes.', 'error');
+        setFeedback(
+          authError,
+          'Não foi possível autenticar',
+          'Não foi possível autenticar. Tente novamente em instantes.',
+          'error'
+        );
       }
       finalizarAuthSubmit();
       return;
@@ -391,14 +429,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (authState.mode === 'signup') {
       if (!emailInput.value || !passwordInput.value || !passwordConfirmInput.value) {
-        authError.innerText = 'Preencha email e senha para continuar.';
-        showToast('Dados incompletos', 'Complete os campos para criar sua conta.', 'error');
+        setFeedback(
+          authError,
+          'Dados incompletos',
+          'Preencha e-mail, senha e confirmação para continuar.',
+          'error'
+        );
         finalizarAuthSubmit();
         return;
       }
       if (passwordInput.value !== passwordConfirmInput.value) {
-        authError.innerText = 'As senhas não conferem.';
-        showToast('Senhas diferentes', 'Verifique as senhas digitadas.', 'error');
+        setFeedback(
+          authError,
+          'Senhas diferentes',
+          'As senhas não conferem. Verifique as senhas digitadas.',
+          'error'
+        );
         finalizarAuthSubmit();
         return;
       }
@@ -411,11 +457,19 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       if (error) {
         if (error.status === 429) {
-          authError.innerText = 'Muitas tentativas. Aguarde alguns minutos e tente novamente.';
-          showToast('Limite atingido', 'Muitas tentativas de cadastro. Aguarde alguns minutos.', 'error');
+          setFeedback(
+            authError,
+            'Limite de tentativas',
+            'Limite de tentativas atingido. Aguarde alguns minutos e tente novamente.',
+            'error'
+          );
         } else {
-          authError.innerText = error.message;
-          showToast('Não foi possível cadastrar', error.message, 'error');
+          setFeedback(
+            authError,
+            'Não foi possível criar a conta',
+            montarMensagemErro('Não foi possível criar a conta.', error),
+            'error'
+          );
         }
         finalizarAuthSubmit();
         return;
@@ -428,8 +482,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (authState.mode === 'recover') {
       if (!emailInput.value) {
-        authError.innerText = 'Informe o email da conta.';
-        showToast('Email necessário', 'Digite o email para recuperar a senha.', 'error');
+        setFeedback(
+          authError,
+          'E-mail necessário',
+          'Informe o e-mail da conta para recuperar a senha.',
+          'error'
+        );
         finalizarAuthSubmit();
         return;
       }
@@ -437,12 +495,16 @@ document.addEventListener('DOMContentLoaded', () => {
         redirectTo: window.location.origin + window.location.pathname
       });
       if (error) {
-        authError.innerText = error.message;
-        showToast('Erro ao enviar email', error.message, 'error');
+        setFeedback(
+          authError,
+          'Não foi possível enviar o e-mail',
+          montarMensagemErro('Não foi possível enviar o e-mail de recuperação.', error),
+          'error'
+        );
         finalizarAuthSubmit();
         return;
       }
-      showToast('Email enviado', 'Confira sua caixa de entrada para redefinir a senha.', 'success');
+      showToast('E-mail enviado', 'Confira sua caixa de entrada para redefinir a senha.', 'success');
       setAuthMode('login');
       finalizarAuthSubmit();
       return;
@@ -450,21 +512,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (authState.mode === 'reset') {
       if (!passwordInput.value || !passwordConfirmInput.value) {
-        authError.innerText = 'Informe e confirme a nova senha.';
-        showToast('Senha necessária', 'Preencha os campos para continuar.', 'error');
+        setFeedback(
+          authError,
+          'Senha necessária',
+          'Informe e confirme a nova senha para continuar.',
+          'error'
+        );
         finalizarAuthSubmit();
         return;
       }
       if (passwordInput.value !== passwordConfirmInput.value) {
-        authError.innerText = 'As senhas não conferem.';
-        showToast('Senhas diferentes', 'Verifique as senhas digitadas.', 'error');
+        setFeedback(
+          authError,
+          'Senhas diferentes',
+          'As senhas não conferem. Verifique as senhas digitadas.',
+          'error'
+        );
         finalizarAuthSubmit();
         return;
       }
       const { error } = await supabase.auth.updateUser({ password: passwordInput.value });
       if (error) {
-        authError.innerText = error.message;
-        showToast('Erro ao atualizar senha', error.message, 'error');
+        setFeedback(
+          authError,
+          'Não foi possível atualizar a senha',
+          montarMensagemErro('Não foi possível atualizar a senha.', error),
+          'error'
+        );
         finalizarAuthSubmit();
         return;
       }
@@ -490,7 +564,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnLogout.addEventListener('click', async () => {
       const { error } = await supabase.auth.signOut();
       if (error) {
-        showToast('Erro ao sair', error.message, 'error');
+        showToast('Não foi possível sair', montarMensagemErro('Não foi possível sair.', error), 'error');
         return;
       }
       showToast('Sessão encerrada', 'Você saiu da sua conta.', 'success');
@@ -569,7 +643,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!confirm('Deseja excluir este investimento?')) return;
         const { error } = await supabase.from('investimentos').delete().eq('id', i.id);
         if (error) {
-          showToast('Erro ao excluir', error.message, 'error');
+          showToast('Não foi possível excluir', montarMensagemErro('Não foi possível excluir o investimento.', error), 'error');
           return;
         }
         showToast('Investimento excluído', 'Registro removido com sucesso.', 'success');
@@ -808,8 +882,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const { data, error } = await supabase.from('investimentos').select('*').eq('usuario_id', userData.user.id).order('data_aporte', { ascending: false });
     if (error) {
-      listaConteudo.innerHTML = '<p class="error">Erro ao carregar investimentos</p>';
-      showToast('Erro ao carregar', 'Não foi possível obter os investimentos.', 'error');
+      listaConteudo.innerHTML = '<p class="error">Não foi possível carregar os investimentos.</p>';
+      showToast('Não foi possível carregar', 'Não foi possível obter os investimentos no momento.', 'error');
       return;
     }
 
@@ -823,25 +897,41 @@ document.addEventListener('DOMContentLoaded', () => {
     e.preventDefault(); formError.innerText = ''; formSuccess.innerText = '';
     const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) {
-      formError.innerText = 'Sessão inválida';
-      showToast('Sessão inválida', 'Faça login novamente para continuar.', 'error');
+      setFeedback(
+        formError,
+        'Sessão inválida',
+        'Sessão inválida. Faça login novamente para continuar.',
+        'error'
+      );
       return;
     }
     const valor = parseFloat(valorInput.value.replace(/\./g, '').replace(',', '.'));
     if (!valor || valor <= 0) {
-      formError.innerText = 'Valor inválido';
-      showToast('Valor inválido', 'Informe um valor maior que zero.', 'error');
+      setFeedback(
+        formError,
+        'Valor inválido',
+        'Informe um valor maior que zero.',
+        'error'
+      );
       return;
     }
     if (!bancoSearch.value || !tipoInput.value || !dataInput.value) {
-      formError.innerText = 'Preencha banco, tipo e data.';
-      showToast('Campos obrigatórios', 'Banco, tipo e data são obrigatórios.', 'error');
+      setFeedback(
+        formError,
+        'Campos obrigatórios',
+        'Preencha banco, tipo e data para continuar.',
+        'error'
+      );
       return;
     }
     const liquidez = document.querySelector('input[name="liquidez"]:checked').value;
     if (liquidez === 'No vencimento' && !vencimentoInput.value) {
-      formError.innerText = 'Data de Vencimento obrigatória';
-      showToast('Vencimento obrigatório', 'Informe a data de vencimento para liquidez no vencimento.', 'error');
+      setFeedback(
+        formError,
+        'Vencimento obrigatório',
+        'Informe a data de vencimento para liquidez no vencimento.',
+        'error'
+      );
       return;
     }
 
@@ -853,12 +943,16 @@ document.addEventListener('DOMContentLoaded', () => {
     else { payload.usuario_id = userData.user.id; ({ error } = await supabase.from('investimentos').insert(payload)); }
 
     if (error) {
-      formError.innerText = error.message;
-      showToast('Erro ao salvar', error.message, 'error');
+      setFeedback(
+        formError,
+        'Não foi possível salvar',
+        montarMensagemErro('Não foi possível salvar o investimento.', error),
+        'error'
+      );
     } else {
       investimentoEditandoId = null; form.reset(); bancoSearch.value = ''; tipoInput.value = ''; descricaoInput.value = '';
       btnSubmit.innerText = 'Salvar'; document.getElementById('form-title').innerText = 'Novo';
-      formSection.classList.add('hidden'); listaSection.classList.remove('hidden'); formSuccess.innerText = 'Investimento salvo com sucesso!';
+      formSection.classList.add('hidden'); listaSection.classList.remove('hidden'); formSuccess.innerText = formatarMensagemFeedback('Investimento salvo com sucesso');
       showToast('Investimento salvo', 'Registro atualizado com sucesso.', 'success');
       atualizarVencimento();
       carregarInvestimentos();
