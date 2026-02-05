@@ -26,6 +26,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnLimparFiltros = document.getElementById('btn-limpar-filtros');
   const btnToggleFiltros = document.getElementById('btn-toggle-filtros');
   const filterCard = document.querySelector('.filter-card');
+  const totaisCard = document.getElementById('totais-card');
+  const metasSectionCard = document.getElementById('metas-section');
+  const ativosSectionCard = document.getElementById('lista');
   const totaisSection = document.getElementById('totais-section');
   const toastContainer = document.getElementById('toast-container');
   const pwaInstallCard = document.getElementById('pwa-install');
@@ -431,30 +434,30 @@ document.addEventListener('DOMContentLoaded', () => {
     aplicarFiltros();
   });
 
-  function atualizarTextoFiltro(colapsado) {
-    if (!btnToggleFiltros) return;
-    btnToggleFiltros.textContent = colapsado ? 'Mostrar filtros' : 'Ocultar filtros';
-    btnToggleFiltros.setAttribute('aria-expanded', String(!colapsado));
-  }
-
-  function definirFiltrosColapsados(colapsado, persistir = true) {
-    if (!filterCard) return;
-    filterCard.classList.toggle('collapsed', colapsado);
-    atualizarTextoFiltro(colapsado);
-    if (persistir) {
-      localStorage.setItem('filtrosColapsados', colapsado ? '1' : '0');
-    }
-  }
-
-  if (btnToggleFiltros && filterCard) {
-    const filtrosSalvos = localStorage.getItem('filtrosColapsados');
-    const iniciarColapsado = filtrosSalvos ? filtrosSalvos === '1' : true;
-    definirFiltrosColapsados(iniciarColapsado, false);
-    btnToggleFiltros.addEventListener('click', () => {
-      const colapsado = filterCard.classList.contains('collapsed');
-      definirFiltrosColapsados(!colapsado);
+  function configurarSecaoColapsavel(section, storageKey, iniciarColapsado = false) {
+    if (!section) return;
+    const toggleButton = section.querySelector('.btn-collapsible-toggle');
+    if (!toggleButton) return;
+    const valorSalvo = localStorage.getItem(storageKey);
+    const colapsado = valorSalvo ? valorSalvo === '1' : iniciarColapsado;
+    const aplicarEstado = (estado, persistir = true) => {
+      section.classList.toggle('collapsed', estado);
+      toggleButton.setAttribute('aria-expanded', String(!estado));
+      toggleButton.setAttribute('aria-label', estado ? 'Expandir seção' : 'Colapsar seção');
+      if (persistir) {
+        localStorage.setItem(storageKey, estado ? '1' : '0');
+      }
+    };
+    aplicarEstado(colapsado, false);
+    toggleButton.addEventListener('click', () => {
+      aplicarEstado(!section.classList.contains('collapsed'));
     });
   }
+
+  configurarSecaoColapsavel(filterCard, 'collapsible:filtros', true);
+  configurarSecaoColapsavel(totaisCard, 'collapsible:totais', false);
+  configurarSecaoColapsavel(metasSectionCard, 'collapsible:metas', false);
+  configurarSecaoColapsavel(ativosSectionCard, 'collapsible:ativos', false);
 
   // HABILITA/DESABILITA VENCIMENTO SEGUNDO LIQUIDEZ
   function atualizarVencimento() {

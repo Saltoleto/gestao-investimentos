@@ -253,6 +253,55 @@ body {
   padding: 20px 24px;
 }
 
+#lista-section {
+  display: grid;
+  gap: 20px;
+}
+
+.collapsible-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.collapsible-body {
+  margin-top: 12px;
+}
+
+.btn-collapsible-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 8px;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+}
+
+.btn-collapsible-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+
+.collapsible-section .icon-chevron-down {
+  display: none;
+}
+
+.collapsible-section.collapsed .icon-chevron-down {
+  display: inline-flex;
+}
+
+.collapsible-section.collapsed .icon-chevron-up {
+  display: none;
+}
+
+.collapsible-section.collapsed .collapsible-body {
+  display: none;
+}
+
 .metas-card {
   display: grid;
   gap: 16px;
@@ -380,17 +429,13 @@ body {
 }
 
 .filter-body {
-  margin-top: 12px;
+  margin-top: 0;
 }
 
 .filter-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 12px 16px;
-}
-
-.filter-card.collapsed .filter-body {
-  display: none;
 }
 
 .section-title {
@@ -609,41 +654,55 @@ select:focus {
   }
 
   .sidebar {
-    width: min(260px, calc(100vw - 32px));
+    width: auto;
     position: fixed;
-    top: 24px;
-    left: 16px;
-    transform: translateX(-120%);
-    transition: transform 0.2s ease;
-    z-index: 20;
+    right: 16px;
+    bottom: 20px;
+    top: auto;
+    left: auto;
+    transform: none;
+    transition: none;
+    z-index: 30;
     flex-direction: column;
     align-items: stretch;
+    padding: 0;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    gap: 12px;
   }
 
   .sidebar-nav {
-    grid-auto-flow: row;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
   }
 
   .btn-menu {
-    width: 100%;
-    padding: 10px 14px;
+    width: 52px;
+    height: 52px;
+    padding: 0;
+    border-radius: 999px;
+    justify-content: center;
+    box-shadow: var(--shadow);
+  }
+
+  .btn-menu.btn-ghost {
+    background: var(--surface);
+    color: var(--text);
   }
 
   .hamburger-btn {
-    display: inline-flex;
+    display: none;
   }
 
-  .layout.menu-open .sidebar {
-    transform: translateX(0);
+  .sidebar-brand {
+    display: none;
   }
 
-  .layout.menu-open::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: rgba(15, 23, 42, 0.35);
-    backdrop-filter: blur(2px);
-    z-index: 10;
+  .btn-label {
+    display: none;
   }
 }
 
@@ -675,6 +734,13 @@ select:focus {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  flex-wrap: wrap;
+}
+
+.investimento-list-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
