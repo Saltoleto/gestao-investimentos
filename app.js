@@ -26,6 +26,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const pwaInstallButton = document.getElementById('pwa-install-button');
   const pwaInstallDismiss = document.getElementById('pwa-install-dismiss');
   const pwaInstallHint = document.getElementById('pwa-install-hint');
+  const metaForm = document.getElementById('meta-form');
+  const metaNomeInput = document.getElementById('meta-nome');
+  const metaValorInput = document.getElementById('meta-valor');
+  const metaLista = document.getElementById('meta-lista');
+  const metaError = document.getElementById('meta-error');
+  const metaSuccess = document.getElementById('meta-success');
+  const metaSelect = document.getElementById('meta-select');
 
   const emailInput = document.getElementById('email');
   const passwordInput = document.getElementById('password');
@@ -99,10 +106,17 @@ document.addEventListener('DOMContentLoaded', () => {
   let investimentosCache = [];
   let investimentosFiltradosCache = [];
   let mostrarValores = true;
+  let metasCache = [];
 
   const formatarDataBR = d => d ? d.split('T')[0].split('-').reverse().join('/') : '';
   const formatarMoeda = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   const formatarMoedaComPrivacidade = v => (mostrarValores ? formatarMoeda(v) : 'R$ ••••••');
+  const formatarPercentual = valor => `${valor.toFixed(1)}%`;
+  const obterMetaPorId = id => metasCache.find(meta => meta.id === id);
+  const limparMetaMensagens = () => {
+    if (metaError) metaError.innerText = '';
+    if (metaSuccess) metaSuccess.innerText = '';
+  };
 
   const authState = {
     mode: 'login'
@@ -175,6 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnLogout) {
       btnLogout.classList.remove('hidden');
     }
+    carregarMetas();
     carregarInvestimentos();
   };
 
@@ -274,6 +289,15 @@ document.addEventListener('DOMContentLoaded', () => {
     valorInput.value = v;
   });
 
+  if (metaValorInput) {
+    metaValorInput.addEventListener('input', () => {
+      let v = metaValorInput.value.replace(/\D/g, '');
+      v = (v / 100).toFixed(2).replace('.', ',');
+      v = v.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+      metaValorInput.value = v;
+    });
+  }
+
   function setupAutocomplete(input, list, options) {
     input.addEventListener('input', () => {
       const filter = input.value.toLowerCase();
@@ -315,6 +339,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const tiposDisponiveis = Array.from(new Set([...tiposProdutos, ...dados.map(item => item.tipo_produto).filter(Boolean)])).sort();
     atualizarOpcoesSelect(filtroBanco, bancosDisponiveis, 'Todos');
     atualizarOpcoesSelect(filtroTipo, tiposDisponiveis, 'Todos');
+  }
+
+  function atualizarMetasSelect() {
+    if (!metaSelect) return;
+    const valorAtual = metaSelect.value;
+    metaSelect.innerHTML = '<option value="">Sem meta</option>';
+    metasCache.forEach(meta => {
+      const option = document.createElement('option');
+      option.value = meta.id;
+      option.textContent = `${meta.nome} (${formatarMoeda(meta.valor_meta)})`;
+      metaSelect.appendChild(option);
+    });
+    metaSelect.value = metasCache.some(meta => meta.id === valorAtual) ? valorAtual : '';
   }
 
   function aplicarFiltros() {
@@ -588,6 +625,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnSubmit.innerText = 'Salvar'; document.getElementById('form-title').innerText = 'Novo';
     formSection.classList.remove('hidden'); listaSection.classList.add('hidden'); formError.innerText = ''; formSuccess.innerText = ''; valorInput.focus();
     atualizarVencimento();
+    if (metaSelect) metaSelect.value = '';
   };
 
   if (btnLogout) {
@@ -653,6 +691,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const descricaoProduto = i.descricao_produto?.trim();
       const dataAporte = i.data_aporte ? formatarDataBR(i.data_aporte) : '-';
       const dataVencimento = i.data_vencimento ? formatarDataBR(i.data_vencimento) : '-';
+      const metaVinculada = i.meta_id ? obterMetaPorId(i.meta_id) : null;
       div.innerHTML = `
         <div class="investimento-main">
           <div class="investimento-info">
@@ -666,6 +705,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="investimento-tags">
               <span class="badge">${i.liquidez}</span>
               ${descricaoProduto ? `<span class="badge neutral">${descricaoProduto}</span>` : ''}
+              ${metaVinculada ? `<span class="badge neutral">Meta: ${metaVinculada.nome}</span>` : ''}
             </div>
             <div class="investimento-meta">
               <div>
@@ -688,6 +728,7 @@ document.addEventListener('DOMContentLoaded', () => {
         investimentoEditandoId = i.id; bancoSearch.value = i.banco; tipoInput.value = i.tipo_produto; descricaoInput.value = i.descricao_produto || '';
         valorInput.value = i.valor.toFixed(2).replace('.', ','); dataInput.value = i.data_aporte.split('T')[0]; vencimentoInput.value = i.data_vencimento || '';
         document.querySelector(`input[name="liquidez"][value="${i.liquidez}"]`).checked = true;
+        if (metaSelect) metaSelect.value = i.meta_id || '';
         btnSubmit.innerText = 'Atualizar'; document.getElementById('form-title').innerText = 'Editar';
         formSection.classList.remove('hidden'); listaSection.classList.add('hidden'); formError.innerText = ''; formSuccess.innerText = ''; valorInput.focus();
         atualizarVencimento();
@@ -703,6 +744,73 @@ document.addEventListener('DOMContentLoaded', () => {
         carregarInvestimentos();
       });
       listaConteudo.appendChild(div);
+    });
+  }
+
+  function calcularProgressoMetas(metas, investimentos) {
+    const totaisPorMeta = investimentos.reduce((acc, investimento) => {
+      if (!investimento.meta_id) return acc;
+      acc[investimento.meta_id] = (acc[investimento.meta_id] || 0) + (investimento.valor || 0);
+      return acc;
+    }, {});
+    return metas.map(meta => {
+      const valorAtingido = totaisPorMeta[meta.id] || 0;
+      const percentual = meta.valor_meta ? Math.min((valorAtingido / meta.valor_meta) * 100, 100) : 0;
+      return { ...meta, valorAtingido, percentual };
+    });
+  }
+
+  function renderizarMetas() {
+    if (!metaLista) return;
+    metaLista.innerHTML = '';
+    if (!metasCache.length) {
+      metaLista.innerHTML = `
+        <div class="empty-state">
+          <span aria-hidden="true">🎯</span>
+          <p>Nenhuma meta cadastrada</p>
+          <small>Cadastre uma meta para acompanhar o progresso dos seus investimentos.</small>
+        </div>
+      `;
+      return;
+    }
+    const metasComProgresso = calcularProgressoMetas(metasCache, investimentosCache);
+    metasComProgresso.forEach(meta => {
+      const card = document.createElement('div');
+      card.className = 'meta-card';
+      card.innerHTML = `
+        <div class="meta-card-header">
+          <span class="meta-card-title">${meta.nome}</span>
+          <strong>${formatarMoedaComPrivacidade(meta.valor_meta)}</strong>
+        </div>
+        <div class="meta-card-values">
+          <span>Atingido: ${formatarMoedaComPrivacidade(meta.valorAtingido)}</span>
+          <span>Faltam: ${formatarMoedaComPrivacidade(Math.max(meta.valor_meta - meta.valorAtingido, 0))}</span>
+        </div>
+        <div class="meta-progress">
+          <div class="meta-progress-bar" role="img" aria-label="Progresso da meta ${meta.nome}: ${formatarPercentual(meta.percentual)}">
+            <div class="meta-progress-fill" style="width: ${meta.percentual}%;"></div>
+          </div>
+          <div class="meta-progress-footer">
+            <span>${formatarPercentual(meta.percentual)}</span>
+            <span>${meta.valorAtingido >= meta.valor_meta ? 'Meta concluída' : 'Em andamento'}</span>
+          </div>
+        </div>
+        <div class="meta-actions">
+          <button class="btn btn-ghost" type="button">Excluir</button>
+        </div>
+      `;
+      card.querySelector('.btn-ghost').addEventListener('click', async () => {
+        if (!confirm('Deseja excluir esta meta? Os investimentos vinculados serão desvinculados.')) return;
+        const { error } = await supabase.from('metas').delete().eq('id', meta.id);
+        if (error) {
+          showToast('Não foi possível excluir', montarMensagemErro('Não foi possível excluir a meta.', error), 'error');
+          return;
+        }
+        showToast('Meta excluída', 'Meta removida com sucesso.', 'success');
+        carregarMetas();
+        carregarInvestimentos();
+      });
+      metaLista.appendChild(card);
     });
   }
 
@@ -928,6 +1036,21 @@ document.addEventListener('DOMContentLoaded', () => {
     totaisSection.appendChild(criarTabelaTotais('Instituições financeiras', iconeInstituicao, gruposBanco, 'Sem dados para bancos/corretoras.'));
   }
 
+  async function carregarMetas() {
+    if (metaLista) metaLista.innerHTML = '';
+    const { data: userData } = await supabase.auth.getUser();
+    if (!userData.user) return;
+    const { data, error } = await supabase.from('metas').select('*').eq('usuario_id', userData.user.id).order('data_criacao', { ascending: false });
+    if (error) {
+      if (metaLista) metaLista.innerHTML = '<p class="error">Não foi possível carregar as metas.</p>';
+      showToast('Não foi possível carregar', 'Não foi possível obter as metas no momento.', 'error');
+      return;
+    }
+    metasCache = data || [];
+    atualizarMetasSelect();
+    renderizarMetas();
+  }
+
   // LISTAR INVESTIMENTOS
   async function carregarInvestimentos() {
     listaConteudo.innerHTML = '';
@@ -944,6 +1067,7 @@ document.addEventListener('DOMContentLoaded', () => {
     investimentosCache = data || [];
     atualizarFiltrosComDados(investimentosCache);
     aplicarFiltros();
+    renderizarMetas();
   }
 
   // SALVAR / ATUALIZAR
@@ -989,8 +1113,9 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    const payload = { banco: bancoSearch.value, tipo_produto: tipoInput.value, descricao_produto: descricaoInput.value, valor, liquidez, data_aporte: dataInput.value, 
-      data_vencimento: liquidez === 'No vencimento' ? vencimentoInput.value : null
+    const payload = { banco: bancoSearch.value, tipo_produto: tipoInput.value, descricao_produto: descricaoInput.value, valor, liquidez, data_aporte: dataInput.value,
+      data_vencimento: liquidez === 'No vencimento' ? vencimentoInput.value : null,
+      meta_id: metaSelect && metaSelect.value ? metaSelect.value : null
     };
     let error;
     if (investimentoEditandoId) ({ error } = await supabase.from('investimentos').update(payload).eq('id', investimentoEditandoId));
@@ -1012,6 +1137,66 @@ document.addEventListener('DOMContentLoaded', () => {
       carregarInvestimentos();
     }
   });
+
+  if (metaForm) {
+    metaForm.addEventListener('submit', async event => {
+      event.preventDefault();
+      limparMetaMensagens();
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData.user) {
+        setFeedback(
+          metaError,
+          'Sessão inválida',
+          'Sessão inválida. Faça login novamente para continuar.',
+          'error'
+        );
+        return;
+      }
+      if (!metaNomeInput.value || !metaValorInput.value) {
+        setFeedback(
+          metaError,
+          'Campos obrigatórios',
+          'Preencha o nome e o valor da meta.',
+          'error'
+        );
+        return;
+      }
+      const valorMeta = parseFloat(metaValorInput.value.replace(/\./g, '').replace(',', '.'));
+      if (!valorMeta || valorMeta <= 0) {
+        setFeedback(
+          metaError,
+          'Valor inválido',
+          'Informe um valor de meta maior que zero.',
+          'error'
+        );
+        return;
+      }
+      const payload = {
+        usuario_id: userData.user.id,
+        nome: metaNomeInput.value.trim(),
+        valor_meta: valorMeta
+      };
+      const { error } = await supabase.from('metas').insert(payload);
+      if (error) {
+        setFeedback(
+          metaError,
+          'Não foi possível salvar',
+          montarMensagemErro('Não foi possível salvar a meta.', error),
+          'error'
+        );
+        return;
+      }
+      metaForm.reset();
+      setFeedback(
+        metaSuccess,
+        'Meta cadastrada',
+        'Meta cadastrada com sucesso.',
+        'success',
+        false
+      );
+      carregarMetas();
+    });
+  }
 
   const recoveryInUrl = window.location.hash.includes('type=recovery');
   setAuthMode(recoveryInUrl ? 'reset' : 'login');

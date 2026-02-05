@@ -148,6 +148,104 @@ body {
   padding: 20px 24px;
 }
 
+.metas-card {
+  display: grid;
+  gap: 16px;
+}
+
+.metas-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.metas-header .subtitle {
+  margin-top: 4px;
+}
+
+.metas-body {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  align-items: flex-start;
+}
+
+.metas-form {
+  display: grid;
+  gap: 8px;
+}
+
+.metas-list {
+  display: grid;
+  gap: 12px;
+}
+
+.meta-card {
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  padding: 16px;
+  background: var(--surface-alt);
+  display: grid;
+  gap: 10px;
+}
+
+.meta-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.meta-card-title {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.meta-card-values {
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.meta-progress {
+  display: grid;
+  gap: 6px;
+}
+
+.meta-progress-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: #edf2ff;
+  overflow: hidden;
+}
+
+.meta-progress-fill {
+  height: 100%;
+  background: var(--primary);
+}
+
+.meta-progress-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.meta-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.meta-actions .btn {
+  padding: 6px 10px;
+  font-size: 12px;
+  border-radius: 999px;
+}
+
 .filter-header {
   display: flex;
   justify-content: space-between;
