@@ -112,6 +112,30 @@
           </div>
         </div>
       </div>
+      <section class="card metas-card" aria-live="polite">
+        <div class="metas-header">
+          <div>
+            <h3 class="font-bold text-slate-800">Metas de investimento</h3>
+            <p class="subtitle">Acompanhe o progresso das metas e vincule novos aportes.</p>
+          </div>
+        </div>
+        <div class="metas-body">
+          <form id="meta-form" class="metas-form">
+            <div class="form-group">
+              <label for="meta-nome">Nome da meta</label>
+              <input id="meta-nome" placeholder="Ex: Reserva de emergência" />
+            </div>
+            <div class="form-group">
+              <label for="meta-valor">Valor da meta</label>
+              <input id="meta-valor" placeholder="R$ 0,00" inputmode="decimal" />
+            </div>
+            <button class="btn btn-primary" type="submit">Cadastrar meta</button>
+            <p id="meta-error" class="error" role="alert"></p>
+            <p id="meta-success" class="success" role="status"></p>
+          </form>
+          <div id="meta-lista" class="metas-list"></div>
+        </div>
+      </section>
       <section id="totais-section" class="totais-grid" aria-live="polite"></section>
       <div id="lista" class="card investimento-list">
         <div class="investimento-list-header">
@@ -158,6 +182,13 @@
           <div class="form-group">
             <label for="descricao">Descrição do Produto</label>
             <input id="descricao" placeholder="Ex: CDB, Ação, LCI..." />
+          </div>
+
+          <div class="form-group">
+            <label for="meta-select">Meta vinculada</label>
+            <select id="meta-select">
+              <option value="">Sem meta</option>
+            </select>
           </div>
 
           <div class="form-group">
