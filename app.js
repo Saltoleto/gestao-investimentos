@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const authDiv = document.getElementById('auth');
   const listaSection = document.getElementById('lista-section');
   const formSection = document.getElementById('form-section');
+  const metaFormSection = document.getElementById('meta-form-section');
   const listaConteudo = document.getElementById('lista-conteudo');
   const listaResumo = document.getElementById('lista-resumo');
   const form = document.getElementById('form');
@@ -15,6 +16,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnCancelar = document.getElementById('btn-cancelar');
   const btnLogout = document.getElementById('btn-logout');
   const btnMeta = document.getElementById('btn-meta');
+  const btnCancelarMeta = document.getElementById('btn-cancelar-meta');
+  const layout = document.getElementById('app-layout');
+  const sidebar = document.getElementById('sidebar');
+  const menuToggle = document.getElementById('menu-toggle');
   const filtroBanco = document.getElementById('filtro-banco');
   const filtroTipo = document.getElementById('filtro-tipo');
   const filtroLiquidez = document.getElementById('filtro-liquidez');
@@ -27,7 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const pwaInstallButton = document.getElementById('pwa-install-button');
   const pwaInstallDismiss = document.getElementById('pwa-install-dismiss');
   const pwaInstallHint = document.getElementById('pwa-install-hint');
-  const metaFormCard = document.getElementById('meta-form-card');
   const metaForm = document.getElementById('meta-form');
   const metaNomeInput = document.getElementById('meta-nome');
   const metaValorInput = document.getElementById('meta-valor');
@@ -124,6 +128,37 @@ document.addEventListener('DOMContentLoaded', () => {
     mode: 'login'
   };
 
+  const mobileMenuQuery = window.matchMedia('(max-width: 900px)');
+  let menuPinned = false;
+
+  const atualizarEstadoMenu = isOpen => {
+    if (!layout || !menuToggle) return;
+    layout.classList.toggle('menu-open', isOpen);
+    menuToggle.setAttribute('aria-expanded', String(isOpen));
+  };
+
+  const fecharMenu = () => {
+    if (!mobileMenuQuery.matches) return;
+    if (menuPinned) return;
+    atualizarEstadoMenu(false);
+  };
+
+  const abrirMenu = () => {
+    if (!mobileMenuQuery.matches) return;
+    atualizarEstadoMenu(true);
+  };
+
+  const prepararMenuHamburger = () => {
+    if (!layout || !menuToggle) return;
+    if (!mobileMenuQuery.matches) {
+      menuPinned = false;
+      layout.classList.remove('menu-open');
+      menuToggle.setAttribute('aria-expanded', 'true');
+      return;
+    }
+    menuToggle.setAttribute('aria-expanded', String(layout.classList.contains('menu-open')));
+  };
+
   const resetAuthMensagens = () => {
     authError.innerText = '';
     formError.innerText = '';
@@ -140,8 +175,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const ocultarMetas = mode === 'login' || mode === 'signup' || mode === 'recover';
       btnMeta.classList.toggle('hidden', ocultarMetas);
     }
-    if (metaFormCard) {
-      metaFormCard.classList.add('hidden');
+    if (metaFormSection) {
+      metaFormSection.classList.add('hidden');
     }
     if (mode === 'login') {
       authTitle.innerText = 'Entrar';
@@ -192,6 +227,9 @@ document.addEventListener('DOMContentLoaded', () => {
     authDiv.classList.add('hidden');
     listaSection.classList.remove('hidden');
     formSection.classList.add('hidden');
+    if (metaFormSection) {
+      metaFormSection.classList.add('hidden');
+    }
     if (btnNovo) {
       btnNovo.classList.remove('hidden');
     }
@@ -635,19 +673,31 @@ document.addEventListener('DOMContentLoaded', () => {
   const abrirFormularioNovoInvestimento = () => {
     investimentoEditandoId = null; form.reset(); bancoSearch.value = ''; tipoInput.value = ''; descricaoInput.value = '';
     btnSubmit.innerText = 'Salvar'; document.getElementById('form-title').innerText = 'Novo';
-    formSection.classList.remove('hidden'); listaSection.classList.add('hidden'); formError.innerText = ''; formSuccess.innerText = ''; valorInput.focus();
+    formSection.classList.remove('hidden'); listaSection.classList.add('hidden');
+    if (metaFormSection) metaFormSection.classList.add('hidden');
+    formError.innerText = ''; formSuccess.innerText = ''; valorInput.focus();
     atualizarVencimento();
     if (metaSelect) metaSelect.value = '';
+    fecharMenu();
   };
 
-  const alternarFormularioMeta = () => {
-    if (!metaFormCard) return;
-    const estavaOculto = metaFormCard.classList.contains('hidden');
-    metaFormCard.classList.toggle('hidden');
-    if (estavaOculto) {
-      metaFormCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      if (metaNomeInput) metaNomeInput.focus();
-    }
+  const abrirFormularioMeta = () => {
+    if (!metaFormSection) return;
+    listaSection.classList.add('hidden');
+    formSection.classList.add('hidden');
+    metaFormSection.classList.remove('hidden');
+    metaForm.reset();
+    limparMetaMensagens();
+    metaFormSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (metaNomeInput) metaNomeInput.focus();
+    fecharMenu();
+  };
+
+  const fecharFormularioMeta = () => {
+    if (!metaFormSection) return;
+    metaFormSection.classList.add('hidden');
+    listaSection.classList.remove('hidden');
+    limparMetaMensagens();
   };
 
   if (btnLogout) {
@@ -670,7 +720,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (btnMeta) {
     btnMeta.addEventListener('click', () => {
-      alternarFormularioMeta();
+      abrirFormularioMeta();
     });
   }
 
@@ -681,6 +731,52 @@ document.addEventListener('DOMContentLoaded', () => {
     atualizarVencimento();
     showToast('Ação cancelada', 'O aporte não foi alterado.', 'info');
   });
+
+  if (btnCancelarMeta) {
+    btnCancelarMeta.addEventListener('click', () => {
+      fecharFormularioMeta();
+      showToast('Ação cancelada', 'A meta não foi alterada.', 'info');
+    });
+  }
+
+  if (menuToggle) {
+    menuToggle.addEventListener('click', () => {
+      if (!layout) return;
+      const aberto = layout.classList.contains('menu-open');
+      menuPinned = !aberto;
+      atualizarEstadoMenu(!aberto);
+    });
+
+    menuToggle.addEventListener('mouseenter', () => {
+      if (!mobileMenuQuery.matches) return;
+      menuPinned = false;
+      abrirMenu();
+    });
+
+    menuToggle.addEventListener('mouseleave', () => {
+      fecharMenu();
+    });
+  }
+
+  if (sidebar) {
+    sidebar.addEventListener('mouseenter', () => {
+      abrirMenu();
+    });
+    sidebar.addEventListener('mouseleave', () => {
+      fecharMenu();
+    });
+  }
+
+  document.addEventListener('click', event => {
+    if (!layout || !mobileMenuQuery.matches) return;
+    if (!layout.classList.contains('menu-open')) return;
+    if (event.target.closest('#sidebar') || event.target.closest('#menu-toggle')) return;
+    menuPinned = false;
+    atualizarEstadoMenu(false);
+  });
+
+  mobileMenuQuery.addEventListener('change', prepararMenuHamburger);
+  prepararMenuHamburger();
 
   // LISTAR INVESTIMENTOS
   function renderizarInvestimentos(investimentos) {
@@ -1215,13 +1311,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       metaForm.reset();
-      setFeedback(
-        metaSuccess,
-        'Meta cadastrada',
-        'Meta cadastrada com sucesso.',
-        'success',
-        false
-      );
+      fecharFormularioMeta();
+      showToast('Meta cadastrada', 'Meta cadastrada com sucesso.', 'success');
       carregarMetas();
     });
   }
@@ -1234,6 +1325,9 @@ document.addEventListener('DOMContentLoaded', () => {
       authDiv.classList.remove('hidden');
       listaSection.classList.add('hidden');
       formSection.classList.add('hidden');
+      if (metaFormSection) {
+        metaFormSection.classList.add('hidden');
+      }
       setAuthMode('reset');
       if (btnLogout) {
         btnLogout.classList.add('hidden');
@@ -1244,6 +1338,9 @@ document.addEventListener('DOMContentLoaded', () => {
       authDiv.classList.remove('hidden');
       listaSection.classList.add('hidden');
       formSection.classList.add('hidden');
+      if (metaFormSection) {
+        metaFormSection.classList.add('hidden');
+      }
       setAuthMode('login');
       if (btnLogout) {
         btnLogout.classList.add('hidden');
