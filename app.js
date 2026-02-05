@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnNovo = document.getElementById('btn-novo');
   const btnCancelar = document.getElementById('btn-cancelar');
   const btnLogout = document.getElementById('btn-logout');
+  const btnMeta = document.getElementById('btn-meta');
   const filtroBanco = document.getElementById('filtro-banco');
   const filtroTipo = document.getElementById('filtro-tipo');
   const filtroLiquidez = document.getElementById('filtro-liquidez');
@@ -26,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const pwaInstallButton = document.getElementById('pwa-install-button');
   const pwaInstallDismiss = document.getElementById('pwa-install-dismiss');
   const pwaInstallHint = document.getElementById('pwa-install-hint');
+  const metaFormCard = document.getElementById('meta-form-card');
   const metaForm = document.getElementById('meta-form');
   const metaNomeInput = document.getElementById('meta-nome');
   const metaValorInput = document.getElementById('meta-valor');
@@ -134,6 +136,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const ocultarCriar = mode === 'login' || mode === 'signup' || mode === 'recover';
       btnNovo.classList.toggle('hidden', ocultarCriar);
     }
+    if (btnMeta) {
+      const ocultarMetas = mode === 'login' || mode === 'signup' || mode === 'recover';
+      btnMeta.classList.toggle('hidden', ocultarMetas);
+    }
+    if (metaFormCard) {
+      metaFormCard.classList.add('hidden');
+    }
     if (mode === 'login') {
       authTitle.innerText = 'Entrar';
       authHelper.innerText = 'Gerencie seus investimentos com uma visão clara e segura.';
@@ -185,6 +194,9 @@ document.addEventListener('DOMContentLoaded', () => {
     formSection.classList.add('hidden');
     if (btnNovo) {
       btnNovo.classList.remove('hidden');
+    }
+    if (btnMeta) {
+      btnMeta.classList.remove('hidden');
     }
     if (btnLogout) {
       btnLogout.classList.remove('hidden');
@@ -628,6 +640,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (metaSelect) metaSelect.value = '';
   };
 
+  const alternarFormularioMeta = () => {
+    if (!metaFormCard) return;
+    const estavaOculto = metaFormCard.classList.contains('hidden');
+    metaFormCard.classList.toggle('hidden');
+    if (estavaOculto) {
+      metaFormCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (metaNomeInput) metaNomeInput.focus();
+    }
+  };
+
   if (btnLogout) {
     btnLogout.addEventListener('click', async () => {
       btnLogout.disabled = true;
@@ -645,6 +667,12 @@ document.addEventListener('DOMContentLoaded', () => {
   btnNovo.addEventListener('click', () => {
     abrirFormularioNovoInvestimento();
   });
+
+  if (btnMeta) {
+    btnMeta.addEventListener('click', () => {
+      alternarFormularioMeta();
+    });
+  }
 
   // CANCELAR
   btnCancelar.addEventListener('click', () => {
