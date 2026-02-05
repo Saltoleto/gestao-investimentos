@@ -14,8 +14,8 @@
 </head>
 
 <body>
-  <div class="layout">
-    <aside class="sidebar">
+  <div class="layout" id="app-layout">
+    <aside class="sidebar" id="sidebar">
       <div class="sidebar-brand">
         <span class="page-title-icon" aria-hidden="true">📊</span>
         <div>
@@ -45,9 +45,14 @@
     <main class="container">
       <header class="page-header">
         <div class="page-header-top">
-          <div class="page-title-shell">
-            <span class="page-title-icon" aria-hidden="true">📊</span>
-            <h1 class="page-title">Gestão de investimentos</h1>
+          <div class="page-header-left">
+            <button id="menu-toggle" class="hamburger-btn" type="button" aria-label="Abrir menu" aria-controls="sidebar" aria-expanded="false">
+              <span class="hamburger-icon" aria-hidden="true"></span>
+            </button>
+            <div class="page-title-shell">
+              <span class="page-title-icon" aria-hidden="true">📊</span>
+              <h1 class="page-title">Gestão de investimentos</h1>
+            </div>
           </div>
         </div>
       </header>
@@ -124,29 +129,6 @@
           </div>
         </div>
       </div>
-      <section id="meta-form-card" class="card metas-card hidden" aria-live="polite">
-        <div class="metas-header">
-          <div>
-            <h3 class="font-bold text-slate-800">Cadastrar meta</h3>
-            <p class="subtitle">Defina novos objetivos e acompanhe seu progresso.</p>
-          </div>
-        </div>
-        <div class="metas-body metas-body-single">
-          <form id="meta-form" class="metas-form">
-            <div class="form-group">
-              <label for="meta-nome">Nome da meta</label>
-              <input id="meta-nome" placeholder="Ex: Reserva de emergência" />
-            </div>
-            <div class="form-group">
-              <label for="meta-valor">Valor da meta</label>
-              <input id="meta-valor" placeholder="R$ 0,00" inputmode="decimal" />
-            </div>
-            <button class="btn btn-primary" type="submit">Cadastrar meta</button>
-            <p id="meta-error" class="error" role="alert"></p>
-            <p id="meta-success" class="success" role="status"></p>
-          </form>
-        </div>
-      </section>
       <section id="totais-section" class="totais-grid" aria-live="polite"></section>
       <section class="card metas-list-card" aria-live="polite">
         <div class="metas-header">
@@ -170,6 +152,34 @@
     </section>
 
     <!-- FORMULÁRIO DE APORTE -->
+    <section id="meta-form-section" class="hidden">
+      <header class="app-header">
+        <div class="header-title">
+          <h2 class="section-title">Nova meta</h2>
+          <p class="subtitle">Defina novos objetivos e acompanhe seu progresso.</p>
+        </div>
+      </header>
+      <div class="card card-spacing metas-card" aria-live="polite">
+        <div class="metas-body metas-body-single">
+          <form id="meta-form" class="metas-form">
+            <div class="form-group">
+              <label for="meta-nome">Nome da meta</label>
+              <input id="meta-nome" placeholder="Ex: Reserva de emergência" />
+            </div>
+            <div class="form-group">
+              <label for="meta-valor">Valor da meta</label>
+              <input id="meta-valor" placeholder="R$ 0,00" inputmode="decimal" />
+            </div>
+            <div class="form-buttons">
+              <button type="button" id="btn-cancelar-meta" class="btn btn-cancel">Cancelar</button>
+              <button class="btn btn-primary" type="submit">Cadastrar meta</button>
+            </div>
+            <p id="meta-error" class="error" role="alert"></p>
+            <p id="meta-success" class="success" role="status"></p>
+          </form>
+        </div>
+      </div>
+    </section>
     <section id="form-section" class="hidden">
       <header class="app-header">
         <div class="header-title">
