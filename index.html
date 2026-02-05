@@ -24,21 +24,21 @@
         </div>
       </div>
       <nav class="sidebar-nav" aria-label="Menu principal">
-        <button id="btn-novo" class="btn btn-primary btn-menu" type="button">
+        <button id="btn-novo" class="btn btn-primary btn-menu" type="button" aria-label="Cadastrar investimento">
           <span class="btn-fab-icon" aria-hidden="true">+</span>
-          Criar aporte
+          <span class="btn-label">Criar aporte</span>
         </button>
-        <button id="btn-meta" class="btn btn-ghost btn-menu hidden" type="button">
+        <button id="btn-meta" class="btn btn-ghost btn-menu hidden" type="button" aria-label="Cadastrar meta">
           <span aria-hidden="true">🎯</span>
-          Cadastrar meta
+          <span class="btn-label">Cadastrar meta</span>
         </button>
-        <button id="btn-logout" class="btn btn-logout btn-menu hidden" type="button">
+        <button id="btn-logout" class="btn btn-logout btn-menu hidden" type="button" aria-label="Sair">
           <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
             <path d="M16 17l5-5-5-5"></path>
             <path d="M21 12H9"></path>
           </svg>
-          Sair
+          <span class="btn-label">Sair</span>
         </button>
       </nav>
     </aside>
@@ -96,15 +96,22 @@
 
     <!-- LISTA DE INVESTIMENTOS -->
     <section id="lista-section" class="hidden">
-      <div class="card filter-card">
-        <div class="filter-header">
+      <div class="card filter-card collapsible-section" id="filtros-section" data-collapsible="filtros">
+        <div class="filter-header collapsible-header">
           <h3>Filtros</h3>
           <div class="filter-actions">
-            <button id="btn-toggle-filtros" class="btn btn-ghost" type="button" aria-expanded="false">Mostrar filtros</button>
+            <button id="btn-toggle-filtros" class="btn btn-ghost btn-collapsible-toggle" type="button" aria-expanded="false" aria-label="Expandir filtros">
+              <svg class="icon-chevron-down" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m6 9 6 6 6-6"></path>
+              </svg>
+              <svg class="icon-chevron-up" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m18 15-6-6-6 6"></path>
+              </svg>
+            </button>
             <button id="btn-limpar-filtros" class="btn btn-ghost" type="button">Limpar</button>
           </div>
         </div>
-        <div class="filter-body">
+        <div class="filter-body collapsible-body">
           <div class="filter-grid">
             <div class="form-group">
               <label for="filtro-banco">Banco/Corretora</label>
@@ -129,25 +136,65 @@
           </div>
         </div>
       </div>
-      <section id="totais-section" class="totais-grid" aria-live="polite"></section>
-      <section class="card metas-list-card" aria-live="polite">
-        <div class="metas-header">
+      <section id="totais-card" class="card collapsible-section" data-collapsible="totais">
+        <div class="collapsible-header">
+          <div>
+            <h3 class="font-bold text-slate-800">Resumo geral</h3>
+            <p class="subtitle">Visão consolidada do patrimônio e da distribuição dos investimentos.</p>
+          </div>
+          <button class="btn btn-ghost btn-collapsible-toggle" type="button" aria-expanded="true" aria-label="Colapsar seção">
+            <svg class="icon-chevron-down" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m6 9 6 6 6-6"></path>
+            </svg>
+            <svg class="icon-chevron-up" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m18 15-6-6-6 6"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="collapsible-body">
+          <section id="totais-section" class="totais-grid" aria-live="polite"></section>
+        </div>
+      </section>
+      <section id="metas-section" class="card metas-list-card collapsible-section" data-collapsible="metas" aria-live="polite">
+        <div class="metas-header collapsible-header">
           <div>
             <h3 class="font-bold text-slate-800">Metas de investimento</h3>
             <p class="subtitle">Acompanhe o progresso das metas e vincule novos aportes.</p>
           </div>
+          <button class="btn btn-ghost btn-collapsible-toggle" type="button" aria-expanded="true" aria-label="Colapsar seção">
+            <svg class="icon-chevron-down" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m6 9 6 6 6-6"></path>
+            </svg>
+            <svg class="icon-chevron-up" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m18 15-6-6-6 6"></path>
+            </svg>
+          </button>
         </div>
-        <div id="meta-lista" class="metas-list"></div>
+        <div class="collapsible-body">
+          <div id="meta-lista" class="metas-list"></div>
+        </div>
       </section>
-      <div id="lista" class="card investimento-list">
-        <div class="investimento-list-header">
+      <div id="lista" class="card investimento-list collapsible-section" data-collapsible="ativos">
+        <div class="investimento-list-header collapsible-header">
           <h3 class="font-bold text-slate-800 flex items-center gap-1">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-briefcase text-slate-500"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path><rect width="20" height="14" x="2" y="6" rx="2"></rect></svg>
             <span>Ativos</span>
           </h3>
-          <span id="lista-resumo" class="investimento-resumo" aria-live="polite"></span>
+          <div class="investimento-list-actions">
+            <span id="lista-resumo" class="investimento-resumo" aria-live="polite"></span>
+            <button class="btn btn-ghost btn-collapsible-toggle" type="button" aria-expanded="true" aria-label="Colapsar seção">
+              <svg class="icon-chevron-down" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m6 9 6 6 6-6"></path>
+              </svg>
+              <svg class="icon-chevron-up" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m18 15-6-6-6 6"></path>
+              </svg>
+            </button>
+          </div>
         </div>
-        <div id="lista-conteudo"></div>
+        <div class="collapsible-body">
+          <div id="lista-conteudo"></div>
+        </div>
       </div>
     </section>
 
